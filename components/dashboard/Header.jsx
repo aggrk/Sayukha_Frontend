@@ -19,7 +19,7 @@ export default function Header({ activeNav, setSidebarOpen }) {
   const [searchFocused, setSearchFocused] = useState(false);
   const dropRef = useRef(null);
   const { user, logout } = useAuth();
-  const { name, email } = user?.data;
+  const { name, email, role } = user?.data;
 
   useEffect(() => {
     function handleClickOutside(e) {
@@ -160,7 +160,7 @@ export default function Header({ activeNav, setSidebarOpen }) {
                 <p className="text-sm font-semibold text-gray-800 leading-tight">
                   {name}
                 </p>
-                <p className="text-[10px] text-gray-400">Super Admin</p>
+                <p className="text-[10px] text-gray-400">{role}</p>
               </div>
               <span
                 className={`text-gray-400 transition-transform duration-200 ${profileOpen ? "rotate-180" : ""}`}
@@ -225,11 +225,7 @@ export default function Header({ activeNav, setSidebarOpen }) {
           {/* Logout Button (visible on desktop outside dropdown) */}
           <button
             onClick={logout}
-            className="hidden lg:flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold text-white cursor-pointer transition-all duration-200 hover:opacity-90 active:scale-[0.97] shadow-sm"
-            style={{
-              background: `linear-gradient(135deg, ${theme.red} 0%, ${theme.redDark} 100%)`,
-              boxShadow: `0 4px 14px ${theme.red}35`,
-            }}
+            className="hidden lg:flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold text-white cursor-pointer transition-all duration-200 hover:bg-red hover:opacity-90 active:scale-[0.97] shadow-sm bg-red-dark"
           >
             <LogOut />
             Logout

@@ -3,12 +3,13 @@
 
 import { useAuth } from "../../hooks/useAuth";
 import { theme } from "../../lib/data";
-import { LayoutDashboard, FileText, Receipt, X } from "lucide-react";
+import { LayoutDashboard, FileText, Receipt, X, BrickWall } from "lucide-react";
 
 const navLinks = [
   { label: "Dashboard", icon: <LayoutDashboard size={18} /> },
   { label: "Reports", icon: <FileText size={18} /> },
   { label: "Expenses", icon: <Receipt size={18} /> },
+  { label: "Projects", icon: <BrickWall size={18} /> },
 ];
 
 export default function Sidebar({

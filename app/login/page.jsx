@@ -5,6 +5,7 @@ import { AuthenticationContext } from "../../context/AuthContext";
 import { useRouter } from "next/navigation";
 import { useContext } from "react";
 import { useForm } from "react-hook-form";
+import Image from "next/image";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -134,8 +135,14 @@ function Sidebar() {
   return (
     <div className="hidden lg:flex flex-col justify-center w-2/5 px-20 bg-[#1A1A1A] border-r border-white/5">
       <div className="flex items-center gap-4 mb-20">
-        <div className="w-12 h-12 bg-[#C1121F] flex items-center justify-center rounded-md">
-          <span className="text-white text-xl font-bold">S</span>
+        <div className="w-16 h-16 flex items-center justify-center">
+          <Image
+            src="/logo.png"
+            width={64}
+            height={64}
+            alt="logo"
+            className="object-contain w-full h-full drop-shadow-md"
+          />
         </div>
         <div>
           <p className="text-lg font-semibold tracking-wide text-[#FAFAFA]">

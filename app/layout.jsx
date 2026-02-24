@@ -2,6 +2,7 @@ import { Poppins, Inter } from "next/font/google";
 import "./globals.css";
 import AuthContextProvider from "../context/AuthContext";
 import QueryProvider from "../providers/QueryProvider";
+import { Toaster } from "react-hot-toast";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -48,6 +49,10 @@ export default function RootLayout({ children }) {
       <body className="bg-black text-white-soft overflow-x-hidden font-body antialiased">
         <QueryProvider>
           <AuthContextProvider>{children}</AuthContextProvider>
+          <Toaster
+            position="top-center"
+            toastOptions={{ duration: 5000, style: { width: "400px" } }}
+          />
         </QueryProvider>
       </body>
     </html>

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useState, useEffect } from "react";
 
 export function Navbar() {
@@ -22,8 +23,10 @@ export function Navbar() {
     >
       {/* Logo */}
       <Link href="/" className="flex items-center gap-3 no-underline">
-        <div className="w-9.5 h-9.5 bg-red clip-logo flex items-center justify-center shrink-0">
-          <span className="font-heading font-black text-lg text-white">S</span>
+        <div className="w-9.5 h-9.5  flex items-center justify-center shrink-0">
+          {/* <span className="font-heading font-black text-lg text-white">S</span>
+           */}
+          <Image src="/logo.png" alt="logo" width={150} height={200} />
         </div>
         <div className="font-heading font-black text-xl text-white-soft tracking-[0.08em] leading-none">
           SAYUKHA CONSTRUCTION

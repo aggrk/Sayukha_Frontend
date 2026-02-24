@@ -8,11 +8,11 @@ import ReportsPage from "../../components/dashboard/reports/ReportsPage";
 import ExpensesPage from "../../components/dashboard/expenses/ExpensesPage";
 import UserOnly from "../../auth/UserOnly";
 import Header from "../../components/dashboard/Header";
+import ProjectsPage from "../../components/dashboard/projects/ProjectsPage";
 
 export default function DashboardPage() {
   const [activeNav, setActiveNav] = useState("Dashboard");
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  console.log(activeNav);
 
   const renderContent = () => {
     switch (activeNav) {
@@ -22,6 +22,8 @@ export default function DashboardPage() {
         return <ReportsPage />;
       case "Expenses":
         return <ExpensesPage />;
+      case "Projects":
+        return <ProjectsPage />;
       default:
         return <DashboardContent />;
     }

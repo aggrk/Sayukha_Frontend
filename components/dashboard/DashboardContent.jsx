@@ -1,7 +1,7 @@
 "use client";
 import useSummaryCards from "../../hooks/useSummaryCards";
 import ChartSection from "../../components/dashboard/ChartSection";
-import EmployeeTable from "../../components/dashboard/EmployeeTable";
+import EmployeeTable from "./employees/EmployeeTable";
 import SummaryCard from "../../components/dashboard/SummaryCard";
 
 export default function DashboardContent() {
