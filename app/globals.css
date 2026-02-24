@@ -1,26 +1,146 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+/* ── Base resets ── */
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  html {
+    scroll-behavior: smooth;
+  }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  body {
+    font-family: var(--font-body);
+    background-color: var(--color-black);
+    color: var(--color-white-soft);
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .heading {
+    font-family: var(--font-heading);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-heading);
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+  }
+
+  /* Pulse animation for Hero badge dot */
+  @keyframes pulse-dot {
+    0%,
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.5;
+      transform: scale(1.3);
+    }
+  }
+
+  .animate-pulse-dot {
+    animation: pulse-dot 2s ease-in-out infinite;
+  }
+  @theme {
+    /* Colors */
+    --color-black: #0f0f0f;
+    --color-dark: #1a1a1a;
+    --color-green: #0b6b3a;
+    --color-green-light: #0e7a3e;
+    --color-red: #c1121f;
+    --color-red-dark: #9b0e18;
+    --color-gray-light: #f5f5f5;
+    --color-gray-soft: #d1d5db;
+    --color-white-soft: #fafafa;
+
+    /* Fonts */
+    --font-heading: var(--font-poppins);
+    --font-body: var(--font-inter);
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* ── Utility classes (clip-paths, etc.) ── */
+@layer utilities {
+  .clip-notch {
+    clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 0 100%);
+  }
+
+  .clip-notch-sm {
+    clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 0 100%);
+  }
+
+  .clip-logo {
+    clip-path: polygon(0 0, 80% 0, 100% 20%, 100% 100%, 0 100%);
+  }
+
+  .clip-building {
+    clip-path: polygon(0 0, 90% 0, 100% 8%, 100% 100%, 10% 100%, 0 92%);
+  }
+
+  .clip-cta {
+    clip-path: polygon(0 0, 100% 0, 100% 85%, 95% 100%, 0 100%);
+  }
+
+  .font-condensed {
+    font-family: var(--font-condensed);
+  }
+
+  .font-body {
+    font-family: var(--font-body);
+  }
+
+  /* Background grid pattern used in hero */
+  .bg-grid {
+    background-image:
+      repeating-linear-gradient(
+        90deg,
+        transparent,
+        transparent 60px,
+        rgba(255, 255, 255, 0.012) 60px,
+        rgba(255, 255, 255, 0.012) 61px
+      ),
+      repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 60px,
+        rgba(255, 255, 255, 0.012) 60px,
+        rgba(255, 255, 255, 0.012) 61px
+      );
+  }
+
+  /* Diagonal hatching pattern (used in stats / CTA sections) */
+  .bg-hatch {
+    background-image: repeating-linear-gradient(
+      -45deg,
+      transparent,
+      transparent 30px,
+      rgba(0, 0, 0, 0.05) 30px,
+      rgba(0, 0, 0, 0.05) 31px
+    );
+  }
+}
+
+/* globals.css */
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(1.3);
+  }
 }
