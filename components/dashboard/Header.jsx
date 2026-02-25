@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { theme } from "../../lib/data";
 import { useAuth } from "../../hooks/useAuth";
+import Link from "next/link";
 import {
   Bell,
   ChevronDown,
@@ -57,7 +58,7 @@ export default function Header({ activeNav, setSidebarOpen }) {
       <div className="flex items-center gap-4 px-6 py-4">
         {/* Hamburger (mobile) */}
         <button
-          className="lg:hidden p-2 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-all"
+          className="rounded-lg p-2 text-gray-400 transition-all hover:bg-gray-100 hover:text-gray-700 lg:hidden"
           onClick={() => setSidebarOpen(true)}
           aria-label="Open sidebar"
         >
@@ -67,12 +68,12 @@ export default function Header({ activeNav, setSidebarOpen }) {
         {/* Page Title + Subtitle */}
         <div className="hidden lg:block">
           <h1
-            className="text-xl font-semibold text-gray-900 leading-tight"
+            className="text-xl leading-tight font-semibold text-gray-900"
             style={{ fontFamily: "'Poppins', sans-serif" }}
           >
             {activeNav}
           </h1>
-          <p className="text-xs text-gray-400 mt-0.5">
+          <p className="mt-0.5 text-xs text-gray-400">
             {pageDescriptions[activeNav]}
           </p>
         </div>
@@ -86,7 +87,7 @@ export default function Header({ activeNav, setSidebarOpen }) {
         </h1>
 
         {/* Search */}
-        <div className="flex-1 max-w-md lg:ml-8 hidden sm:block">
+        <div className="hidden max-w-md flex-1 sm:block lg:ml-8">
           <div
             className="relative flex items-center rounded-xl border transition-all duration-200"
             style={{
@@ -95,13 +96,13 @@ export default function Header({ activeNav, setSidebarOpen }) {
               boxShadow: searchFocused ? `0 0 0 3px ${theme.green}18` : "none",
             }}
           >
-            <span className="absolute left-3.5 text-gray-400 pointer-events-none">
+            <span className="pointer-events-none absolute left-3.5 text-gray-400">
               <Search />
             </span>
             <input
               type="text"
               placeholder="Search employees, expenses…"
-              className="w-full pl-10 pr-4 py-2.5 text-sm bg-transparent outline-none text-gray-700 placeholder-gray-400"
+              className="w-full bg-transparent py-2.5 pr-4 pl-10 text-sm text-gray-700 placeholder-gray-400 outline-none"
               onFocus={() => setSearchFocused(true)}
               onBlur={() => setSearchFocused(false)}
             />
@@ -112,7 +113,7 @@ export default function Header({ activeNav, setSidebarOpen }) {
         <div className="ml-auto flex items-center gap-2">
           {/* Date badge (desktop) */}
           <span
-            className="hidden xl:block text-xs text-gray-400 px-3 py-1.5 rounded-lg border mr-2"
+            className="mr-2 hidden rounded-lg border px-3 py-1.5 text-xs text-gray-400 xl:block"
             style={{
               borderColor: theme.graySoft,
               backgroundColor: theme.grayLight,
@@ -123,19 +124,19 @@ export default function Header({ activeNav, setSidebarOpen }) {
 
           {/* Notification Bell */}
           <button
-            className="relative p-2.5 rounded-xl text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-all duration-200"
+            className="relative rounded-xl p-2.5 text-gray-400 transition-all duration-200 hover:bg-gray-100 hover:text-gray-700"
             aria-label="Notifications"
           >
             <Bell />
             <span
-              className="absolute top-2 right-2 w-2 h-2 rounded-full border-2 border-white"
+              className="absolute top-2 right-2 h-2 w-2 rounded-full border-2 border-white"
               style={{ backgroundColor: theme.red }}
             />
           </button>
 
           {/* Divider */}
           <div
-            className="w-px h-8 mx-1"
+            className="mx-1 h-8 w-px"
             style={{ backgroundColor: theme.graySoft }}
           />
 
@@ -143,10 +144,10 @@ export default function Header({ activeNav, setSidebarOpen }) {
           <div className="relative" ref={dropRef}>
             <button
               onClick={() => setProfileOpen(!profileOpen)}
-              className="flex items-center gap-2.5 px-3 py-2 rounded-xl hover:bg-gray-100 transition-all duration-200"
+              className="flex items-center gap-2.5 rounded-xl px-3 py-2 transition-all duration-200 hover:bg-gray-100"
             >
               <div
-                className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0"
+                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white"
                 style={{
                   background: `linear-gradient(135deg, ${theme.green} 0%, ${theme.greenLight} 100%)`,
                 }}
@@ -156,8 +157,8 @@ export default function Header({ activeNav, setSidebarOpen }) {
                   .map((n) => n[0])
                   .join("")}
               </div>
-              <div className="hidden md:block text-left">
-                <p className="text-sm font-semibold text-gray-800 leading-tight">
+              <div className="hidden text-left md:block">
+                <p className="text-sm leading-tight font-semibold text-gray-800">
                   {name}
                 </p>
                 <p className="text-[10px] text-gray-400">{role}</p>
@@ -172,7 +173,7 @@ export default function Header({ activeNav, setSidebarOpen }) {
             {/* Dropdown Panel */}
             {profileOpen && (
               <div
-                className="absolute right-0 top-[calc(100%+8px)] w-52 rounded-2xl shadow-xl border overflow-hidden z-50 bg-white"
+                className="absolute top-[calc(100%+8px)] right-0 z-50 w-52 overflow-hidden rounded-2xl border bg-white shadow-xl"
                 style={{ borderColor: theme.graySoft }}
               >
                 {/* Profile header */}
@@ -187,17 +188,26 @@ export default function Header({ activeNav, setSidebarOpen }) {
                 {/* Menu items */}
                 <div className="py-1.5">
                   {[
-                    { label: "My Profile", icon: <User /> },
-                    { label: "Settings", icon: <Settings /> },
-                    { label: "Help & Support", icon: <MessageCircleMore /> },
+                    {
+                      label: "My Profile",
+                      icon: <User />,
+                      link: "/dashboard/profile",
+                    },
+                    {
+                      label: "Settings",
+                      icon: <Settings />,
+                      link: "/dashboard/settings",
+                    },
+                    // { label: "Help & Support", icon: <MessageCircleMore /> },
                   ].map((item) => (
-                    <button
+                    <Link
+                      href={item.link}
                       key={item.label}
-                      className="w-full text-left px-4 py-2.5 text-sm text-gray-600 hover:bg-gray-50 flex items-center gap-3 transition-colors"
+                      className="flex w-full cursor-pointer items-center gap-3 px-4 py-2.5 text-left text-sm text-gray-600 transition-colors hover:bg-gray-50"
                     >
                       <span>{item.icon}</span>
                       {item.label}
-                    </button>
+                    </Link>
                   ))}
                 </div>
 
@@ -207,7 +217,7 @@ export default function Header({ activeNav, setSidebarOpen }) {
                   style={{ borderTop: `1px solid ${theme.graySoft}` }}
                 >
                   <button
-                    className="w-full text-left cursor-pointer px-3 py-2.5 text-sm font-medium rounded-xl flex items-center gap-3 transition-all hover:opacity-90"
+                    className="flex w-full cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-medium transition-all hover:opacity-90"
                     onClick={logout}
                     style={{
                       backgroundColor: `${theme.red}12`,
@@ -225,7 +235,7 @@ export default function Header({ activeNav, setSidebarOpen }) {
           {/* Logout Button (visible on desktop outside dropdown) */}
           <button
             onClick={logout}
-            className="hidden lg:flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold text-white cursor-pointer transition-all duration-200 hover:bg-red hover:opacity-90 active:scale-[0.97] shadow-sm bg-red-dark"
+            className="hover:bg-red bg-red-dark hidden cursor-pointer items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:opacity-90 active:scale-[0.97] lg:flex"
           >
             <LogOut />
             Logout

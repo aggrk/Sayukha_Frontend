@@ -67,14 +67,14 @@ export default function ExpensesPage() {
           <div className="flex items-center gap-2.5">
             <button
               onClick={() => setShowAddModal(true)}
-              className="inline-flex items-center gap-2 bg-linear-to-r from-green to-green-light hover:opacity-90 text-white text-sm font-semibold px-5 py-2.5 rounded-xl shadow-md shadow-green-200 transition-all duration-200 hover:-translate-y-px whitespace-nowrap"
+              className="inline-flex cursor-pointer items-center gap-2 bg-linear-to-r from-green to-green-light hover:opacity-90 text-white text-sm font-semibold px-5 py-2.5 rounded-xl shadow-md shadow-green-200 transition-all duration-200 hover:-translate-y-px whitespace-nowrap"
             >
               <Plus size={16} />
               Add Expense
             </button>
             <button
               onClick={handleExportExcel}
-              className="inline-flex items-center gap-2 bg-white hover:bg-gray-50 text-green border border-gray-200 text-sm font-semibold px-5 py-2.5 rounded-xl shadow-sm transition-all duration-200 hover:-translate-y-px whitespace-nowrap"
+              className="inline-flex cursor-pointer items-center gap-2 bg-white hover:bg-gray-50 text-green border border-gray-200 text-sm font-semibold px-5 py-2.5 rounded-xl shadow-sm transition-all duration-200 hover:-translate-y-px whitespace-nowrap"
             >
               <Download size={16} />
               Export Excel
@@ -208,14 +208,14 @@ export default function ExpensesPage() {
                       <div className="flex items-center gap-2">
                         <button
                           onClick={() => setEditExpense(expense)}
-                          className="w-8 h-8 rounded-lg flex items-center justify-center bg-green-light/10 hover:bg-green-light/20 text-green-light transition-colors"
+                          className="w-8 h-8 cursor-pointer rounded-lg flex items-center justify-center bg-green-light/10 hover:bg-green-light/20 text-green-light transition-colors"
                           title="Edit expense"
                         >
                           <Pencil size={14} />
                         </button>
                         <button
                           onClick={() => setDeleteExpense(expense)}
-                          className="w-8 h-8 rounded-lg flex items-center justify-center bg-red-50 hover:bg-red-100 text-red transition-colors"
+                          className="w-8 h-8 cursor-pointer rounded-lg flex items-center justify-center bg-red-50 hover:bg-red-100 text-red transition-colors"
                           title="Delete expense"
                         >
                           <Trash2 size={14} />

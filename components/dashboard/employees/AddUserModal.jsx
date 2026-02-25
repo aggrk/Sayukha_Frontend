@@ -51,12 +51,12 @@ export default function AddUserModal({ onClose, onSuccess }) {
   });
 
   return (
-    <div className="fixed inset-0 h-full  z-50 flex items-center bg-black/40 backdrop-blur-sm justify-center p-4">
-      <div className="w-full max-w-lg rounded-2xl bg-white border border-[#e5e7eb] shadow-2xl overflow-hidden">
+    <div className="fixed inset-0 z-50 flex h-full items-center justify-center bg-black/40 p-4 backdrop-blur-sm">
+      <div className="w-full max-w-lg overflow-hidden rounded-2xl border border-[#e5e7eb] bg-white shadow-2xl">
         {/* Header */}
-        <div className="px-6 py-5 flex items-center border-[#f3f4f6] bg-linear-to-br from-[#eff6ff] to-[#dbeafe] justify-between border-b">
+        <div className="flex items-center justify-between border-b border-[#f3f4f6] bg-linear-to-br from-[#eff6ff] to-[#dbeafe] px-6 py-5">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-green text-gray-light flex items-center justify-center shadow-sm">
+            <div className="bg-green text-gray-light flex h-10 w-10 items-center justify-center rounded-xl shadow-sm">
               <User size={18} />
             </div>
             <div>
@@ -66,7 +66,7 @@ export default function AddUserModal({ onClose, onSuccess }) {
               >
                 Add New Employee
               </p>
-              <p className="text-xs text-gray-500 mt-0.5">
+              <p className="mt-0.5 text-xs text-gray-500">
                 Fill in the details below to register
               </p>
             </div>
@@ -74,7 +74,7 @@ export default function AddUserModal({ onClose, onSuccess }) {
           <button
             type="button"
             onClick={onClose}
-            className="w-8 h-8 rounded-xl flex items-center justify-center hover:bg-black/5 transition-colors"
+            className="flex h-8 w-8 items-center justify-center rounded-xl transition-colors hover:bg-black/5"
           >
             <X size={16} className="text-gray-500" />
           </button>
@@ -82,29 +82,29 @@ export default function AddUserModal({ onClose, onSuccess }) {
 
         {/* Form */}
         <form onSubmit={handleSubmit((data) => mutate(data))}>
-          <div className="px-6 py-5 flex flex-col gap-4">
+          <div className="flex flex-col gap-4 px-6 py-5">
             {/* ── Personal Info ──────────────────────────────────────── */}
-            <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 flex items-center gap-2">
-              <span className="w-4 h-px inline-block bg-gray-low-soft" />
+            <p className="flex items-center gap-2 text-[10px] font-bold tracking-widest text-gray-400 uppercase">
+              <span className="bg-gray-low-soft inline-block h-px w-4" />
               Personal Info
-              <span className="flex-1 h-px inline-block bg-gray-low-soft" />
+              <span className="bg-gray-low-soft inline-block h-px flex-1" />
             </p>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               {/* Name */}
               <div className="flex flex-col gap-1.5">
-                <label className="text-[11px] font-bold uppercase tracking-widest text-gray-400 flex items-center gap-1.5">
+                <label className="flex items-center gap-1.5 text-[11px] font-bold tracking-widest text-gray-400 uppercase">
                   <User size={12} /> Full Name{" "}
                   <span className="text-red-400">*</span>
                 </label>
                 <div className="relative">
-                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400">
+                  <span className="absolute top-1/2 left-3.5 -translate-y-1/2 text-gray-400">
                     <User size={14} />
                   </span>
                   <input
                     {...register("name", { required: "Name is required" })}
                     placeholder="e.g. John Doe"
-                    className={`w-full text-dark border font-body  text-sm py-2.5 pl-10 pr-4 rounded-xl outline-none  ${
+                    className={`text-dark font-body w-full rounded-xl border py-2.5 pr-4 pl-10 text-sm outline-none ${
                       errors.name
                         ? "border-[#fca5a5] bg-[#fff7f7]"
                         : "border-[#e5e7eb] bg-white"
@@ -112,7 +112,7 @@ export default function AddUserModal({ onClose, onSuccess }) {
                   />
                 </div>
                 {errors.name && (
-                  <p className="text-[11px] text-red-400 font-medium">
+                  <p className="text-[11px] font-medium text-red-400">
                     {errors.name.message}
                   </p>
                 )}
@@ -120,12 +120,12 @@ export default function AddUserModal({ onClose, onSuccess }) {
 
               {/* Email */}
               <div className="flex flex-col gap-1.5">
-                <label className="text-[11px] font-bold uppercase tracking-widest text-gray-400 flex items-center gap-1.5">
+                <label className="flex items-center gap-1.5 text-[11px] font-bold tracking-widest text-gray-400 uppercase">
                   <Mail size={12} /> Email Address{" "}
                   <span className="text-red-400">*</span>
                 </label>
                 <div className="relative">
-                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400">
+                  <span className="absolute top-1/2 left-3.5 -translate-y-1/2 text-gray-400">
                     <Mail size={14} />
                   </span>
                   <input
@@ -138,7 +138,7 @@ export default function AddUserModal({ onClose, onSuccess }) {
                     })}
                     type="email"
                     placeholder="e.g. john@company.com"
-                    className={`w-full text-dark border font-body  text-sm py-2.5 pl-10 pr-4 rounded-xl outline-none  ${
+                    className={`text-dark font-body w-full rounded-xl border py-2.5 pr-4 pl-10 text-sm outline-none ${
                       errors.email
                         ? "border-[#fca5a5] bg-[#fff7f7]"
                         : "border-[#e5e7eb] bg-white"
@@ -146,7 +146,7 @@ export default function AddUserModal({ onClose, onSuccess }) {
                   />
                 </div>
                 {errors.email && (
-                  <p className="text-[11px] text-red-400 font-medium">
+                  <p className="text-[11px] font-medium text-red-400">
                     {errors.email.message}
                   </p>
                 )}
@@ -155,19 +155,19 @@ export default function AddUserModal({ onClose, onSuccess }) {
 
             {/* Phone */}
             <div className="flex flex-col gap-1.5">
-              <label className="text-[11px] font-bold uppercase tracking-widest text-gray-400 flex items-center gap-1.5">
+              <label className="flex items-center gap-1.5 text-[11px] font-bold tracking-widest text-gray-400 uppercase">
                 <Phone size={12} /> Phone Number{" "}
                 <span className="text-red-400">*</span>
               </label>
               <div className="relative">
-                <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400">
+                <span className="absolute top-1/2 left-3.5 -translate-y-1/2 text-gray-400">
                   <Phone size={14} />
                 </span>
                 <input
                   {...register("phone", { required: "Phone is required" })}
                   type="tel"
                   placeholder="e.g. +255 712 345 678"
-                  className={`w-full text-dark border font-body  text-sm py-2.5 pl-10 pr-4 rounded-xl outline-none  ${
+                  className={`text-dark font-body w-full rounded-xl border py-2.5 pr-4 pl-10 text-sm outline-none ${
                     errors.phone
                       ? "border-[#fca5a5] bg-[#fff7f7]"
                       : "border-[#e5e7eb] bg-white"
@@ -175,28 +175,28 @@ export default function AddUserModal({ onClose, onSuccess }) {
                 />
               </div>
               {errors.phone && (
-                <p className="text-[11px] text-red-400 font-medium">
+                <p className="text-[11px] font-medium text-red-400">
                   {errors.phone.message}
                 </p>
               )}
             </div>
 
             {/* ── Job Info ───────────────────────────────────────────── */}
-            <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 flex items-center gap-2">
-              <span className="w-4 h-px inline-block bg-gray-low-soft" />
+            <p className="flex items-center gap-2 text-[10px] font-bold tracking-widest text-gray-400 uppercase">
+              <span className="bg-gray-low-soft inline-block h-px w-4" />
               Job Info
-              <span className="flex-1 h-px inline-block bg-gray-low-soft" />
+              <span className="bg-gray-low-soft inline-block h-px flex-1" />
             </p>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               {/* Position */}
               <div className="flex flex-col gap-1.5">
-                <label className="text-[11px] font-bold uppercase tracking-widest text-gray-400 flex items-center gap-1.5">
+                <label className="flex items-center gap-1.5 text-[11px] font-bold tracking-widest text-gray-400 uppercase">
                   <Briefcase size={12} /> Position{" "}
                   <span className="text-red-400">*</span>
                 </label>
                 <div className="relative">
-                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400">
+                  <span className="absolute top-1/2 left-3.5 -translate-y-1/2 text-gray-400">
                     <Briefcase size={14} />
                   </span>
                   <input
@@ -204,7 +204,7 @@ export default function AddUserModal({ onClose, onSuccess }) {
                       required: "Position is required",
                     })}
                     placeholder="e.g. Site Manager"
-                    className={`w-full text-dark border font-body  text-sm py-2.5 pl-10 pr-4 rounded-xl outline-none  ${
+                    className={`text-dark font-body w-full rounded-xl border py-2.5 pr-4 pl-10 text-sm outline-none ${
                       errors.position
                         ? "border-[#fca5a5] bg-[#fff7f7]"
                         : "border-[#e5e7eb] bg-white"
@@ -212,7 +212,7 @@ export default function AddUserModal({ onClose, onSuccess }) {
                   />
                 </div>
                 {errors.position && (
-                  <p className="text-[11px] text-red-400 font-medium">
+                  <p className="text-[11px] font-medium text-red-400">
                     {errors.position.message}
                   </p>
                 )}
@@ -220,12 +220,12 @@ export default function AddUserModal({ onClose, onSuccess }) {
 
               {/* Account Number */}
               <div className="flex flex-col gap-1.5">
-                <label className="text-[11px] font-bold uppercase tracking-widest text-gray-400 flex items-center gap-1.5">
+                <label className="flex items-center gap-1.5 text-[11px] font-bold tracking-widest text-gray-400 uppercase">
                   <CreditCard size={12} /> Account Number{" "}
                   <span className="text-red-400">*</span>
                 </label>
                 <div className="relative">
-                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400">
+                  <span className="absolute top-1/2 left-3.5 -translate-y-1/2 text-gray-400">
                     <CreditCard size={14} />
                   </span>
                   <input
@@ -233,7 +233,7 @@ export default function AddUserModal({ onClose, onSuccess }) {
                       required: "Account number is required",
                     })}
                     placeholder="e.g. 1234567890"
-                    className={`w-full text-dark border font-body  text-sm py-2.5 pl-10 pr-4 rounded-xl outline-none  ${
+                    className={`text-dark font-body w-full rounded-xl border py-2.5 pr-4 pl-10 text-sm outline-none ${
                       errors.account_number
                         ? "border-[#fca5a5] bg-[#fff7f7]"
                         : "border-[#e5e7eb] bg-white"
@@ -241,7 +241,7 @@ export default function AddUserModal({ onClose, onSuccess }) {
                   />
                 </div>
                 {errors.account_number && (
-                  <p className="text-[11px] text-red-400 font-medium">
+                  <p className="text-[11px] font-medium text-red-400">
                     {errors.account_number.message}
                   </p>
                 )}
@@ -250,7 +250,7 @@ export default function AddUserModal({ onClose, onSuccess }) {
 
             {/* Basic Salary */}
             <div className="flex flex-col gap-1.5">
-              <label className="text-[11px] font-bold uppercase tracking-widest text-gray-400 flex items-center gap-1.5">
+              <label className="flex items-center gap-1.5 text-[11px] font-bold tracking-widest text-gray-400 uppercase">
                 <DollarSign size={12} /> Basic Salary{" "}
                 <span className="text-red-400">*</span>
               </label>
@@ -262,18 +262,18 @@ export default function AddUserModal({ onClose, onSuccess }) {
                   })}
                   type="number"
                   placeholder="0.00"
-                  className={`w-full text-dark border font-body  text-sm py-2.5 pl-10 pr-4 rounded-xl outline-none  ${
+                  className={`text-dark font-body w-full rounded-xl border py-2.5 pr-4 pl-10 text-sm outline-none ${
                     errors.basic_salary
                       ? "border-[#fca5a5] bg-[#fff7f7]"
                       : "border-[#e5e7eb] bg-white"
                   }`}
                 />
-                <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[11px] font-bold text-gray-400">
+                <span className="absolute top-1/2 right-3.5 -translate-y-1/2 text-[11px] font-bold text-gray-400">
                   TSH
                 </span>
               </div>
               {errors.basic_salary && (
-                <p className="text-[11px] text-red-400 font-medium">
+                <p className="text-[11px] font-medium text-red-400">
                   {errors.basic_salary.message}
                 </p>
               )}
@@ -281,8 +281,8 @@ export default function AddUserModal({ onClose, onSuccess }) {
 
             {/* Server Error */}
             {serverError && (
-              <div className="flex items-center bg-[#fee2e2] gap-2 px-4 py-2.5 rounded-xl">
-                <X size={13} className="text-red-500 shrink-0" />
+              <div className="flex items-center gap-2 rounded-xl bg-[#fee2e2] px-4 py-2.5">
+                <X size={13} className="shrink-0 text-red-500" />
                 <p className="text-xs font-medium text-red-600">
                   {serverError}
                 </p>
@@ -291,7 +291,7 @@ export default function AddUserModal({ onClose, onSuccess }) {
 
             {/* Success */}
             {isSuccess && (
-              <div className="flex items-center bg-[#dcfce7] gap-2 px-4 py-2.5 rounded-xl">
+              <div className="flex items-center gap-2 rounded-xl bg-[#dcfce7] px-4 py-2.5">
                 <p className="text-xs font-medium text-green-700">
                   Employee registered successfully!
                 </p>
@@ -299,14 +299,14 @@ export default function AddUserModal({ onClose, onSuccess }) {
             )}
           </div>
 
-          <div className="h-px mx-6 bg-[#f3f4f6]" />
+          <div className="mx-6 h-px bg-[#f3f4f6]" />
 
           {/* Footer */}
-          <div className="px-6 py-4 flex items-center justify-end gap-3">
+          <div className="flex items-center justify-end gap-3 px-6 py-4">
             <button
               type="button"
               onClick={onClose}
-              className="px-5 py-2.5 rounded-xl text-sm font-semibold border transition-all hover:bg-gray-50"
+              className="rounded-xl border px-5 py-2.5 text-sm font-semibold transition-all hover:bg-gray-50"
               style={{ borderColor: "#e5e7eb", color: "#6b7280" }}
             >
               Cancel
@@ -314,7 +314,7 @@ export default function AddUserModal({ onClose, onSuccess }) {
             <button
               type="submit"
               disabled={isPending || isSuccess}
-              className="flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-semibold text-white transition-all hover:opacity-90 cursor-pointer disabled:opacity-60 shadow-sm bg-green"
+              className="bg-green flex cursor-pointer items-center gap-2 rounded-xl px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:opacity-90 disabled:opacity-60"
             >
               {isPending ? (
                 <Loader2 size={15} className="animate-spin" />

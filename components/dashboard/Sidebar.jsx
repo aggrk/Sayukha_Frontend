@@ -1,4 +1,3 @@
-// ─── sidebar.jsx ──────────────────────────────────────────────────────────────
 "use client";
 
 import { useAuth } from "../../hooks/useAuth";
@@ -88,7 +87,7 @@ export default function Sidebar({
                   setActiveNav(link.label);
                   setSidebarOpen(false);
                 }}
-                className={`w-full flex items-center gap-3.5 px-4 py-3 rounded-xl text-sm font-medium
+                className={`w-full flex cursor-pointer items-center gap-3.5 px-4 py-3 rounded-xl text-sm font-medium
                   transition-all duration-200 group relative
                   ${isActive ? "text-white shadow-lg" : "text-white/45 hover:text-white/90 hover:bg-white/5"}`}
                 style={

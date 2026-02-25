@@ -17,8 +17,10 @@ import {
 } from "lucide-react";
 import { getInitials } from "../../../lib/utils";
 import api from "../../../lib/api";
+import { useQueryClient } from "@tanstack/react-query";
 
 export default function UpdateUserModal({ employee, onClose, onSuccess }) {
+  const queryClient = useQueryClient();
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [serverError, setServerError] = useState("");
@@ -47,13 +49,14 @@ export default function UpdateUserModal({ employee, onClose, onSuccess }) {
     setLoading(true);
     try {
       await api.patch(`/users/${employee.id}`, data);
+      await queryClient.invalidateQueries({ queryKey: ["employees"] });
       setSuccess(true);
       setTimeout(() => {
         onSuccess?.();
         onClose();
       }, 1500);
     } catch (err) {
-      setServerError(err?.response?.data?.message ?? "Something went wrong.");
+      setServerError(err?.response?.data?.message);
     } finally {
       setLoading(false);
     }
@@ -282,8 +285,8 @@ export default function UpdateUserModal({ employee, onClose, onSuccess }) {
                       >
                         <option value="">Select role...</option>
                         <option value="admin">Admin</option>
-                        <option value="site_manager">Site Manager</option>
-                        <option value="site_admin">Site Admin</option>
+                        <option value="site manager">Site Manager</option>
+                        <option value="site admin">Site Admin</option>
                         <option value="user">User</option>
                       </select>
                       <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">

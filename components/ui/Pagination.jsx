@@ -1,5 +1,4 @@
 import { ChevronDown } from "lucide-react";
-import { theme } from "../../lib/data";
 export default function Pagination({
   currentPage,
   totalPages,
@@ -23,10 +22,7 @@ export default function Pagination({
     }, []);
 
   return (
-    <div
-      className="px-7 py-4 flex items-center justify-between border-t"
-      style={{ borderColor: theme.graySoft }}
-    >
+    <div className="px-7 py-4 flex mt-3 items-center border-gray-low-soft justify-between border-t">
       <p className="text-xs text-gray-400">
         Showing{" "}
         <span className="font-semibold text-gray-600">
@@ -40,10 +36,9 @@ export default function Pagination({
         <button
           onClick={() => onChange(Math.max(1, currentPage - 1))}
           disabled={currentPage === 1}
-          className="w-8 h-8 rounded-lg flex items-center justify-center transition-all disabled:opacity-30 hover:bg-gray-100"
-          style={{ color: "#9ca3af" }}
+          className="w-8 h-8 rounded-lg cursor-pointer flex items-center justify-center transition-all disabled:opacity-30 hover:bg-gray-100 text-[#9ca3af]"
         >
-          <ChevronDown size={14} style={{ transform: "rotate(90deg)" }} />
+          <ChevronDown size={14} className="rotate-90" />
         </button>
 
         {pages.map((item, idx) =>
@@ -58,14 +53,11 @@ export default function Pagination({
             <button
               key={item}
               onClick={() => onChange(item)}
-              className="w-8 h-8 rounded-lg text-xs font-semibold transition-all"
-              style={{
-                backgroundColor:
-                  currentPage === item ? theme.green : "transparent",
-                color: currentPage === item ? "#fff" : "#9ca3af",
-                boxShadow:
-                  currentPage === item ? `0 2px 8px ${theme.green}40` : "none",
-              }}
+              className={`w-8 h-8 cursor-pointer rounded-lg text-xs font-semibold transition-all duration-200  ${
+                currentPage === item
+                  ? "bg-green text-white shadow-[0_2px_8px_green40]"
+                  : "bg-transparent text-gray-400"
+              }`}
             >
               {item}
             </button>
@@ -75,10 +67,10 @@ export default function Pagination({
         <button
           onClick={() => onChange(Math.min(totalPages, currentPage + 1))}
           disabled={currentPage === totalPages || totalPages === 0}
-          className="w-8 h-8 rounded-lg flex items-center justify-center transition-all disabled:opacity-30 hover:bg-gray-100"
+          className="w-8 h-8 cursor-pointer rounded-lg flex items-center justify-center transition-all disabled:opacity-30 hover:bg-gray-100"
           style={{ color: "#9ca3af" }}
         >
-          <ChevronDown size={14} style={{ transform: "rotate(-90deg)" }} />
+          <ChevronDown size={14} className="-rotate-90" />
         </button>
       </div>
     </div>

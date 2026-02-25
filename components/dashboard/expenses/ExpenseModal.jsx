@@ -79,7 +79,7 @@ export default function ExpenseModal({ expense = null, onClose }) {
           </div>
           <button
             onClick={onClose}
-            className="w-8 h-8 rounded-xl flex items-center justify-center hover:bg-black/5 transition-colors"
+            className="w-8 h-8 cursor-pointer rounded-xl flex items-center justify-center hover:bg-black/5 transition-colors"
           >
             <X size={16} className="text-gray-400" />
           </button>
@@ -212,7 +212,7 @@ export default function ExpenseModal({ expense = null, onClose }) {
             <button
               type="submit"
               disabled={loading}
-              className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold text-white transition-all hover:opacity-90 disabled:opacity-60 shadow-md 
+              className="flex-1 flex items-center cursor-pointer justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold text-white transition-all hover:opacity-90 disabled:opacity-60 shadow-md 
                   bg-linear-to-r from-green to-green-light shadow-green-200"
             >
               {loading ? (
@@ -231,7 +231,7 @@ export default function ExpenseModal({ expense = null, onClose }) {
             <button
               type="button"
               onClick={onClose}
-              className="px-5 py-2.5 rounded-xl text-sm font-semibold border border-gray-200 text-gray-500 hover:bg-gray-50 transition-colors"
+              className="px-5 py-2.5 cursor-pointer rounded-xl text-sm font-semibold border border-gray-200 text-gray-500 hover:bg-gray-50 transition-colors"
             >
               Cancel
             </button>
