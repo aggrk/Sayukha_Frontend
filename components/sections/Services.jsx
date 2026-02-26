@@ -6,48 +6,42 @@ import { services } from "../../lib/data";
 
 export function Services() {
   return (
-    <section id="services" className="bg-dark py-24 px-[8vw]">
+    <section id="services" className="bg-dark px-[8vw] py-24">
       {/* Header */}
-      <div className="flex justify-between items-end mb-16 flex-wrap gap-6">
+      <div className="mb-16 flex flex-wrap items-end justify-between gap-6">
         <div>
           <SectionLabel text="What We Do" />
-          <h2 className="font-heading font-black text-[clamp(36px,4vw,64px)] text-white-soft leading-none">
-            CORE SERVICES
+          <h2 className="font-heading text-white-soft text-[clamp(36px,4vw,64px)] leading-none font-black">
+            OUR SERVICES
           </h2>
         </div>
-        <a
-          href="#contact"
-          className="inline-flex items-center gap-3 border border-green/60 text-green-light px-9 py-4 font-heading text-[15px] font-bold tracking-[0.12em] uppercase clip-notch hover:bg-green/10 transition-all no-underline"
-        >
-          All Services →
-        </a>
       </div>
 
       {/* Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-0.5">
+      <div className="grid grid-cols-1 gap-0.5 md:grid-cols-2 lg:grid-cols-3">
         {services.map((service, index) => (
           <FadeUp key={service.id} delay={index * 0.08}>
-            <div className="group bg-black p-10 relative cursor-pointer border-b-[3px] border-transparent hover:-translate-y-1 transition-all duration-300 overflow-hidden">
+            <div className="group relative cursor-pointer overflow-hidden border-b-[3px] border-transparent bg-black p-10 transition-all duration-300 hover:-translate-y-1">
               {/* Bottom accent bar on hover */}
-              <div className="absolute bottom-0 left-0 w-0 h-0.75 bg-red group-hover:w-full transition-all duration-300" />
+              <div className="bg-red absolute bottom-0 left-0 h-0.75 w-0 transition-all duration-300 group-hover:w-full" />
 
-              <div className="font-heading font-black text-5xl text-white/6 leading-none mb-5 group-hover:text-red transition-colors duration-300">
+              <div className="font-heading group-hover:text-red mb-5 text-5xl leading-none font-black text-white/6 transition-colors duration-300">
                 {service.number}
               </div>
 
-              <div className="w-12 h-12 text-green-light mb-5">
+              <div className="text-green-light mb-5 h-12 w-12">
                 <ServiceIcon name={service.icon} />
               </div>
 
-              <h3 className="font-heading font-black text-2xl text-white-soft leading-[1.1] mb-3 uppercase">
+              <h3 className="font-heading text-white-soft mb-3 text-2xl leading-[1.1] font-black uppercase">
                 {service.title}
               </h3>
 
-              <p className="text-sm leading-[1.7] text-gray-soft">
+              <p className="text-gray-soft text-sm leading-[1.7]">
                 {service.description}
               </p>
 
-              <div className="absolute bottom-7 right-7 w-9 h-9 border border-white/10 flex items-center justify-center text-gray-soft group-hover:bg-red group-hover:border-red group-hover:text-white transition-all duration-300">
+              <div className="text-gray-soft group-hover:bg-red group-hover:border-red absolute right-7 bottom-7 flex h-9 w-9 items-center justify-center border border-white/10 transition-all duration-300 group-hover:text-white">
                 <ArrowRight size={16} strokeWidth={2} />
               </div>
             </div>

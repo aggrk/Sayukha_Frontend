@@ -15,39 +15,38 @@ export function Navbar() {
 
   return (
     <nav
-      className={`fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-[5vw] h-18 transition-all duration-300 ${
+      className={`fixed top-0 right-0 left-0 z-50 flex h-18 items-center justify-between px-[5vw] transition-all duration-300 ${
         scrolled
-          ? "bg-black/95 backdrop-blur-xl border-b border-white/6"
+          ? "border-b border-white/6 bg-black/95 backdrop-blur-xl"
           : "bg-black/70 backdrop-blur-sm"
       }`}
     >
       {/* Logo */}
       <Link href="/" className="flex items-center gap-3 no-underline">
-        <div className="w-9.5 h-9.5  flex items-center justify-center shrink-0">
+        <div className="flex h-9.5 w-9.5 shrink-0 items-center justify-center">
           {/* <span className="font-heading font-black text-lg text-white">S</span>
            */}
           <Image src="/logo.png" alt="logo" width={150} height={200} />
         </div>
-        <div className="font-heading font-black text-xl text-white-soft tracking-[0.08em] leading-none">
-          SAYUKHA CONSTRUCTION
-          <span className="block text-[10px] font-normal tracking-[0.2em] text-gray-soft mt-0.5">
-            CIVIL ENGINEERING · TANZANIA
+        <div className="font-heading text-white-soft text-xl leading-none font-black tracking-[0.08em]">
+          SAYUKHA CONSTRUCTION LTD
+          <span className="text-gray-soft mt-0.5 block text-[10px] font-normal tracking-[0.2em]">
+            CONSTRUCTION COMPANY · TANZANIA
           </span>
         </div>
       </Link>
 
       {/* Nav Links */}
-      <ul className="hidden md:flex items-center gap-9 list-none">
+      <ul className="hidden list-none items-center gap-9 md:flex">
         {[
           { label: "Services", href: "#services" },
           { label: "About", href: "#about" },
           { label: "Projects", href: "#projects" },
-          { label: "Testimonials", href: "#testimonials" },
         ].map((link) => (
           <li key={link.href}>
             <a
               href={link.href}
-              className="font-heading font-semibold text-sm tracking-[0.12em] uppercase text-gray-soft hover:text-white transition-colors no-underline"
+              className="font-heading text-gray-soft text-sm font-semibold tracking-[0.12em] uppercase no-underline transition-colors hover:text-white"
             >
               {link.label}
             </a>
@@ -56,7 +55,7 @@ export function Navbar() {
         <li>
           <a
             href="#contact"
-            className="font-heading font-bold text-sm tracking-[0.12em] uppercase text-white bg-red px-6 py-2.5 clip-notch-sm hover:bg-red-dark transition-colors no-underline"
+            className="font-heading bg-red clip-notch-sm hover:bg-red-dark px-6 py-2.5 text-sm font-bold tracking-[0.12em] text-white uppercase no-underline transition-colors"
           >
             Get a Quote
           </a>
@@ -64,7 +63,7 @@ export function Navbar() {
         <li>
           <Link
             href="login"
-            className="font-heading font-bold text-sm tracking-[0.12em] uppercase text-white bg-red px-6 py-2.5 clip-notch-sm hover:bg-red-dark transition-colors no-underline"
+            className="font-heading bg-red clip-notch-sm hover:bg-red-dark px-6 py-2.5 text-sm font-bold tracking-[0.12em] text-white uppercase no-underline transition-colors"
           >
             Sign In
           </Link>

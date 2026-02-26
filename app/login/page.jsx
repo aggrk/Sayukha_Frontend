@@ -144,7 +144,7 @@ function Sidebar() {
             SAYUKHA
           </p>
           <p className="text-xs tracking-widest text-[#D1D5DB] uppercase opacity-60">
-            Construct Ltd
+            Construction Ltd
           </p>
         </div>
       </div>
@@ -157,7 +157,7 @@ function Sidebar() {
         </h2>
         <p className="text-base leading-relaxed text-[#D1D5DB] opacity-80">
           Secure internal system for overseeing infrastructure projects,
-          financial operations and executive reporting across Tanzania.
+          financial operations and reporting.
         </p>
       </div>
     </div>

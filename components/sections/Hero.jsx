@@ -5,16 +5,16 @@ import Image from "next/image";
 import { FadeUp } from "../ui/FadeUp";
 
 const heroStats = [
-  { value: "180+", label: "Projects Completed" },
-  { value: "15+", label: "Years Operating" },
-  { value: "12", label: "Regions Covered" },
+  { value: "100+", label: "Projects Delivered" },
+  { value: "4+", label: "Years of Trust" },
+  { value: "12", label: "Regions Served" },
 ];
 
 export function Hero() {
   return (
     <section
       id="home"
-      className="min-h-screen grid grid-cols-1 lg:grid-cols-2 relative overflow-hidden pt-8 sm:pt-18"
+      className="relative grid min-h-screen grid-cols-1 overflow-hidden pt-8 sm:pt-18 lg:grid-cols-2"
       style={{
         background: `
           linear-gradient(135deg, rgba(11,107,58,0.08) 0%, transparent 50%),
@@ -26,7 +26,7 @@ export function Hero() {
     >
       {/* Diagonal accent line */}
       <div
-        className="absolute top-0 right-[42%] w-px h-full opacity-30"
+        className="absolute top-0 right-[42%] h-full w-px opacity-30"
         style={{
           background:
             "linear-gradient(to bottom, transparent, #0B6B3A 30%, #0B6B3A 70%, transparent)",
@@ -35,20 +35,20 @@ export function Hero() {
       />
 
       {/* Left: Content */}
-      <div className="flex flex-col justify-center px-[8vw] py-20 relative z-10">
+      <div className="relative z-10 flex flex-col justify-center px-[8vw] py-20">
         <FadeUp>
-          <div className="inline-flex items-center gap-2.5 bg-green/15 border border-green/40 px-4 py-2 mb-8 w-fit">
-            <span className="w-2 h-2 rounded-full bg-green-light animate-pulse" />
-            <span className="font-heading text-[11px] font-bold tracking-[0.18em] text-green-light uppercase">
-              Certified Civil Engineers · Tanzania
+          <div className="bg-green/15 border-green/40 mb-8 inline-flex w-fit items-center gap-2.5 border px-4 py-2">
+            <span className="bg-green-light h-2 w-2 animate-pulse rounded-full" />
+            <span className="font-heading text-green-light text-[11px] font-bold tracking-[0.18em] uppercase">
+              Multi-Engineering & Supplies · Tanzania
             </span>
           </div>
         </FadeUp>
 
         <FadeUp delay={0.1}>
-          <h1 className="font-heading font-black leading-[0.92] mb-7 text-[clamp(40px,7vw,92px)] md:text-[clamp(38px,7vw,80px)]">
-            <span className="text-white-soft block">WE BUILD</span>
-            <span className="text-red block">STRUCTURES</span>
+          <h1 className="font-heading mb-7 text-[clamp(40px,7vw,92px)] leading-[0.92] font-black md:text-[clamp(38px,7vw,80px)]">
+            <span className="text-white-soft block">WHERE TOOLS</span>
+            <span className="text-red block">MEET SKILL,</span>
             <span
               className="block"
               style={{
@@ -57,35 +57,36 @@ export function Hero() {
                 color: "transparent",
               }}
             >
-              THAT ENDURES
+              WORK GETS DONE.
             </span>
           </h1>
         </FadeUp>
 
         <FadeUp delay={0.2}>
-          <p className="text-base font-light leading-[1.7] text-gray-soft max-w-115 mb-11">
-            From roads that connect communities to buildings that define
-            skylines — Sayukha Construction delivers large-scale civil
-            engineering projects across Tanzania with precision, safety, and
-            proven capacity.
+          <p className="text-gray-soft mb-11 max-w-115 text-base leading-[1.7] font-light">
+            From the depths of a mine to the floor of a workshop — Sayukha
+            Construction supplies the expertise, equipment, and industrial
+            muscle to keep Tanzania's toughest operations running. Mining,
+            electrical, metal works, safety gear, and beyond. One partner. Zero
+            compromise.
           </p>
         </FadeUp>
 
         <FadeUp delay={0.3}>
-          <div className="flex flex-wrap gap-4 mb-14">
+          <div className="mb-14 flex flex-wrap gap-4">
             <Link
               href="#contact"
-              className="inline-flex items-center gap-3 bg-red text-white px-9 py-4 font-heading text-[15px] font-bold tracking-[0.12em] uppercase clip-notch hover:bg-red-dark transition-all hover:-translate-y-0.5 no-underline"
+              className="bg-red font-heading clip-notch hover:bg-red-dark inline-flex items-center gap-3 px-9 py-4 text-[15px] font-bold tracking-[0.12em] text-white uppercase no-underline transition-all hover:-translate-y-0.5"
             >
               <ArrowRight size={18} strokeWidth={2.5} />
-              Request Consultation
+              Request a Quote
             </Link>
             <Link
-              href="#projects"
-              className="inline-flex items-center gap-3 bg-transparent text-green-light px-9 py-4 font-heading text-[15px] font-bold tracking-[0.12em] uppercase clip-notch border border-green/60 hover:bg-green/10 transition-all hover:-translate-y-0.5 no-underline"
+              href="#services"
+              className="text-green-light font-heading clip-notch border-green/60 hover:bg-green/10 inline-flex items-center gap-3 border bg-transparent px-9 py-4 text-[15px] font-bold tracking-[0.12em] uppercase no-underline transition-all hover:-translate-y-0.5"
             >
               <Play size={18} strokeWidth={2.5} />
-              View Our Projects
+              Explore Our Services
             </Link>
           </div>
         </FadeUp>
@@ -94,10 +95,10 @@ export function Hero() {
           <div className="flex gap-10">
             {heroStats.map((stat) => (
               <div key={stat.label}>
-                <div className="font-heading font-black text-4xl text-white leading-none">
+                <div className="font-heading text-4xl leading-none font-black text-white">
                   {stat.value}
                 </div>
-                <div className="text-[11px] font-medium tracking-[0.15em] text-gray-soft uppercase mt-1">
+                <div className="text-gray-soft mt-1 text-[11px] font-medium tracking-[0.15em] uppercase">
                   {stat.label}
                 </div>
               </div>
@@ -107,7 +108,7 @@ export function Hero() {
       </div>
 
       {/* Right: Visual */}
-      <div className="hidden lg:block relative overflow-hidden">
+      <div className="relative hidden overflow-hidden lg:block">
         <div
           className="absolute inset-0"
           style={{
@@ -115,12 +116,10 @@ export function Hero() {
               "linear-gradient(to right, #0F0F0F 0%, transparent 30%), linear-gradient(135deg, #1a2a1a 0%, #0a1a0a 50%, #1a0a0a 100%)",
           }}
         />
-        {/* You'd replace this with next/image once real photos are available */}
         <div className="absolute inset-0 flex items-center justify-center">
-          {/* Architectural SVG placeholder - replace with <Image /> */}
           <Image
             src="/images/hero-bg.jpg"
-            alt="Journey from religious dogma to independent thought"
+            alt="Sayukha Construction — Industrial engineering at work"
             fill
             className="object-cover"
             priority
