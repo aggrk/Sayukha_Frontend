@@ -27,18 +27,15 @@ export default function ChangePasswordCard() {
     setSuccessMsg("");
     setErrorMsg("");
     try {
-      const res = await api.patch("/users/updateMyPassword", {
+      await api.patch("/users/updateMyPassword", {
         current_password: data.current_password,
         new_password: data.new_password,
       });
-      console.log(res.data);
-      if (res?.data.status === "success") {
-        setSuccessMsg(
-          "Password updated successfully. Please log in again if prompted.",
-        );
-        reset();
-        logout();
-      }
+      setSuccessMsg(
+        "Password updated successfully. Please log in again if prompted.",
+      );
+      reset();
+      logout();
     } catch (err) {
       setErrorMsg(
         err?.response?.data?.message ??

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import useFetch from "../../../hooks/useFetch";
 import { Plus, Pencil, Trash2, FolderOpen, FileText } from "lucide-react";
 import { LIMIT, formatCurrency, formatDate } from "../../../lib/utils";
@@ -8,6 +8,11 @@ import Pagination from "../../ui/Pagination";
 import ProjectModal from "./ProjectModal";
 import DeleteModal from "./DeleteModal";
 import CreateReportModal from "./CreateReportModal";
+import ActionDropdown from "./ActionDropdown";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import api from "../../../lib/api";
+import toast from "react-hot-toast";
+import { useAuth } from "../../../hooks/useAuth";
 
 function StatusBadge({ status }) {
   const map = {
@@ -34,15 +39,22 @@ export default function ProjectsPage() {
   const [deleteProject, setDeleteProject] = useState(null);
   const [reportProject, setReportProject] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [openDropdown, setOpenDropdown] = useState(null);
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
+
+  const endPoint =
+    user?.data?.role === "admin" ? "/projects" : "/projects/myProjects";
 
   const {
     data: projectData,
     isLoading,
     isError,
-  } = useFetch("projects", "/projects", {
+  } = useFetch("projects", endPoint, {
     page: currentPage,
     limit: LIMIT,
   });
+  console.log(projectData);
 
   const projects = projectData?.data ?? [];
   const totalCount = projectData?.results ?? 0;
@@ -53,9 +65,26 @@ export default function ProjectsPage() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
+  const handleToggle = useCallback((id) => {
+    setOpenDropdown((prev) => (prev === id ? null : id));
+  }, []);
+
+  const mutation = useMutation({
+    mutationFn: async (data) => {
+      await api.patch(`/projects/${data.project_id}/assignSupervisor`, {
+        project_supervisor: data.employeeId,
+      });
+    },
+    onSuccess: async () => {
+      toast.success("Supervisor Assigned Successfully!");
+      await queryClient.invalidateQueries({ queryKey: ["projects"] });
+    },
+    onError: (err) => toast.error(err?.message),
+  });
+
   return (
-    <div className="bg-gray-light font-body min-h-screen px-4 py-8">
-      <div className="mx-auto max-w-7xl">
+    <div className="font-body min-h-screen py-8">
+      <div className="mx-auto">
         {/* Header */}
         <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
           <div>
@@ -63,18 +92,22 @@ export default function ProjectsPage() {
               Projects
             </h1>
             <p className="mt-1 text-sm text-gray-500">
-              Manage and track all your projects
+              {user?.data?.role === "admin"
+                ? "Manage and track all projects"
+                : "Here are the projects you supervise"}
             </p>
           </div>
-          <div className="flex items-center gap-2.5">
-            <button
-              onClick={() => setShowAddModal(true)}
-              className="from-green to-green-light inline-flex cursor-pointer items-center gap-2 rounded-xl bg-linear-to-r px-5 py-2.5 text-sm font-semibold whitespace-nowrap text-white shadow-md shadow-[#0b6b3a35] transition-all duration-200 hover:-translate-y-px hover:opacity-90"
-            >
-              <Plus size={16} />
-              Add Project
-            </button>
-          </div>
+          {user?.data?.role === "admin" && (
+            <div className="flex items-center gap-2.5">
+              <button
+                onClick={() => setShowAddModal(true)}
+                className="from-green to-green-light inline-flex cursor-pointer items-center gap-2 rounded-xl bg-linear-to-r px-5 py-2.5 text-sm font-semibold whitespace-nowrap text-white shadow-md shadow-[#0b6b3a35] transition-all duration-200 hover:-translate-y-px hover:opacity-90"
+              >
+                <Plus size={16} />
+                Add Project
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Loading */}
@@ -101,23 +134,26 @@ export default function ProjectsPage() {
               <FolderOpen size={22} className="text-green" />
             </div>
             <p className="text-sm text-gray-400">No projects found.</p>
-            <button
-              onClick={() => setShowAddModal(true)}
-              className="text-green mt-1 inline-flex cursor-pointer items-center gap-1.5 text-sm font-semibold hover:underline"
-            >
-              <Plus size={14} /> Add your first project
-            </button>
+            {user?.data?.role === "admin" && (
+              <button
+                onClick={() => setShowAddModal(true)}
+                className="text-green mt-1 inline-flex cursor-pointer items-center gap-1.5 text-sm font-semibold hover:underline"
+              >
+                <Plus size={14} /> Add your first project
+              </button>
+            )}
           </div>
         )}
 
         {/* Table */}
         {!isLoading && !isError && projects.length > 0 && (
-          <div className="overflow-x-auto rounded-2xl bg-white shadow-sm">
+          <div className="w-full overflow-x-auto rounded-2xl bg-white shadow-sm">
             <table className="w-full min-w-250 border-collapse text-sm">
               <thead>
                 <tr>
                   {[
                     "Project",
+                    "Project Supervisor",
                     "Location",
                     "Dates",
                     "Contract",
@@ -155,6 +191,11 @@ export default function ProjectsPage() {
                           {project.description}
                         </p>
                       )}
+                    </td>
+                    <td className="px-5 py-4 align-middle">
+                      <p className="leading-snug font-semibold text-black">
+                        {project.project_supervisor_name || "—"}
+                      </p>
                     </td>
 
                     {/* Location */}
@@ -214,23 +255,39 @@ export default function ProjectsPage() {
                           Report
                         </button>
 
-                        {/* Edit */}
-                        <button
-                          onClick={() => setEditProject(project)}
-                          className="bg-green-light/20 text-green hover:bg-green-light/30 flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg transition-colors"
-                          title="Edit project"
-                        >
-                          <Pencil size={14} />
-                        </button>
-
-                        {/* Delete */}
-                        <button
-                          onClick={() => setDeleteProject(project)}
-                          className="text-red flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg bg-red-50 transition-colors hover:bg-red-100"
-                          title="Delete project"
-                        >
-                          <Trash2 size={14} />
-                        </button>
+                        {user?.data?.role === "admin" && (
+                          <>
+                            {" "}
+                            <ActionDropdown
+                              onClose={() => setOpenDropdown(null)}
+                              onSelectEmployee={(employeeId) =>
+                                mutation.mutate({
+                                  project_id: project.id,
+                                  employeeId,
+                                })
+                              }
+                              onToggle={() => handleToggle(project.id)}
+                              isOpen={openDropdown === project.id}
+                              project={project}
+                            />
+                            {/* Edit */}
+                            <button
+                              onClick={() => setEditProject(project)}
+                              className="bg-green-light/20 text-green hover:bg-green-light/30 flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg transition-colors"
+                              title="Edit project"
+                            >
+                              <Pencil size={14} />
+                            </button>
+                            {/* Delete */}
+                            <button
+                              onClick={() => setDeleteProject(project)}
+                              className="text-red flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg bg-red-50 transition-colors hover:bg-red-100"
+                              title="Delete project"
+                            >
+                              <Trash2 size={14} />
+                            </button>
+                          </>
+                        )}
                       </div>
                     </td>
                   </tr>

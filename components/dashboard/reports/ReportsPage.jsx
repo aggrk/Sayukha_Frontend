@@ -16,17 +16,22 @@ import {
 import EditModal from "./EditModal";
 import MetaItem from "../../ui/MetaItems";
 import DeleteModal from "./DeleteModal";
+import { useAuth } from "../../../hooks/useAuth";
 
 export default function ReportPage() {
   const [editReport, setEditReport] = useState(null);
   const [deleteReport, setDeleteReport] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const { user } = useAuth();
+
+  const endPoint =
+    user?.data?.role === "admin" ? "/reports" : "/reports/myReports";
 
   const {
     data: reportsData,
     isLoading,
     isError,
-  } = useFetch("reports", "/reports", {
+  } = useFetch("reports", endPoint, {
     page: currentPage,
     limit: LIMIT,
   });
@@ -64,15 +69,15 @@ export default function ReportPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-light px-4 py-8 font-body">
-      <div className="max-w-6xl mx-auto">
+    <div className="bg-gray-light font-body min-h-screen px-4 py-8">
+      <div className="mx-auto max-w-6xl">
         {/* Header */}
-        <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
+        <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-black leading-tight font-heading">
+            <h1 className="font-heading text-3xl leading-tight font-bold text-black">
               Reports
             </h1>
-            <p className="text-sm text-gray-500 mt-1">
+            <p className="mt-1 text-sm text-gray-500">
               Project reports and summaries
             </p>
           </div>
@@ -80,16 +85,16 @@ export default function ReportPage() {
 
         {/* Loading */}
         {isLoading && (
-          <div className="flex flex-col items-center justify-center gap-3 bg-white rounded-2xl shadow-sm py-16">
-            <div className="w-8 h-8 border-[3px] border-gray-200 border-t-green rounded-full animate-spin" />
+          <div className="flex flex-col items-center justify-center gap-3 rounded-2xl bg-white py-16 shadow-sm">
+            <div className="border-t-green h-8 w-8 animate-spin rounded-full border-[3px] border-gray-200" />
             <p className="text-sm text-gray-400">Loading reports…</p>
           </div>
         )}
 
         {/* Error */}
         {isError && (
-          <div className="flex items-center justify-center bg-red-50 border border-red-100 rounded-2xl py-16">
-            <p className="text-sm font-medium text-red">
+          <div className="flex items-center justify-center rounded-2xl border border-red-100 bg-red-50 py-16">
+            <p className="text-red text-sm font-medium">
               Failed to load reports. Please try again.
             </p>
           </div>
@@ -97,49 +102,43 @@ export default function ReportPage() {
 
         {/* Empty */}
         {!isLoading && !isError && reports.length === 0 && (
-          <div className="flex flex-col items-center justify-center gap-3 bg-white rounded-2xl shadow-sm py-16">
-            <div className="w-12 h-12 rounded-2xl bg-green-50 flex items-center justify-center">
+          <div className="flex flex-col items-center justify-center gap-3 rounded-2xl bg-white py-16 shadow-sm">
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-green-50">
               <FileText size={22} className="text-green" />
             </div>
             <p className="text-sm text-gray-400">No reports available.</p>
-            <button
-              onClick={() => setShowAddModal(true)}
-              className="mt-1 inline-flex items-center gap-1.5 text-sm font-semibold text-green hover:underline"
-            >
-              <Plus size={14} /> Add your first report
-            </button>
           </div>
         )}
 
         {/* Cards Grid */}
         {!isLoading && !isError && reports.length > 0 && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {reports.map((report, index) => (
               <div
                 key={report.id ?? index}
-                className="bg-white rounded-2xl shadow-sm overflow-hidden flex flex-col transition-all duration-200 hover:-translate-y-1 hover:shadow-lg"
+                className="flex flex-col overflow-hidden rounded-2xl bg-white shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-lg"
               >
                 {/* Top accent bar */}
-                <div className="h-1.5 bg-linear-to-r from-green to-green-light" />
+                <div className="from-green to-green-light h-1.5 bg-linear-to-r" />
 
                 {/* Card Header */}
                 <div className="flex items-center justify-between px-5 pt-4 pb-2">
-                  <span className="bg-green-50 text-green border border-green-200 text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-md">
+                  <span className="text-green rounded-md border border-green-200 bg-green-50 px-2.5 py-1 text-[10px] font-bold tracking-widest uppercase">
                     {report.project_code || "N/A"}
                   </span>
-                  <span className="text-xs text-gray-400 font-medium">
+                  <span className="text-xs font-medium text-gray-400">
                     {formatDate(report.report_date)}
                   </span>
                 </div>
 
                 {/* Project Name */}
-                <h2 className="px-5 pb-1 text-[15px] font-bold text-black leading-snug font-heading">
+                <h2 className="font-heading px-5 pb-1 text-[15px] leading-snug font-bold text-black">
                   {report.project_name || "Untitled Project"}
                 </h2>
 
                 {/* Summary */}
                 {report.report_summary && (
-                  <p className="px-5 pb-3 text-[13px] text-gray-500 leading-relaxed line-clamp-3">
+                  <p className="line-clamp-3 px-5 pb-3 text-[13px] leading-relaxed text-gray-500">
                     {report.report_summary}
                   </p>
                 )}
@@ -165,27 +164,27 @@ export default function ReportPage() {
                 </div>
 
                 {/* Divider */}
-                <div className="h-px bg-gray-100 mx-5" />
+                <div className="mx-5 h-px bg-gray-100" />
 
                 {/* Card Footer */}
-                <div className="flex items-center gap-2 px-5 py-3.5 mt-auto">
+                <div className="mt-auto flex items-center gap-2 px-5 py-3.5">
                   <button
                     onClick={() => handleExportWord(report)}
-                    className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-semibold cursor-pointer text-dark border border-gray-200 hover:bg-gray-50 transition-colors"
+                    className="text-dark flex flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-lg border border-gray-200 py-2 text-xs font-semibold transition-colors hover:bg-gray-50"
                   >
                     <FileText size={13} />
                     Export Word
                   </button>
                   <button
                     onClick={() => setEditReport(report)}
-                    className="w-8 h-8 rounded-lg flex items-center justify-center bg-green/10 hover:bg-green/20 cursor-pointer text-green transition-colors"
+                    className="bg-green/10 hover:bg-green/20 text-green flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg transition-colors"
                     title="Edit report"
                   >
                     <Pencil size={14} />
                   </button>
                   <button
                     onClick={() => setDeleteReport(report)}
-                    className="w-8 h-8 rounded-lg flex items-center justify-center bg-red-50 hover:bg-red-100 text-red cursor-pointer transition-colors"
+                    className="text-red flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg bg-red-50 transition-colors hover:bg-red-100"
                     title="Delete report"
                   >
                     <Trash2 size={14} />

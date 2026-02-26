@@ -9,12 +9,15 @@ import ExpensesPage from "../../components/dashboard/expenses/ExpensesPage";
 import UserOnly from "../../auth/UserOnly";
 import Header from "../../components/dashboard/Header";
 import ProjectsPage from "../../components/dashboard/projects/ProjectsPage";
+import User from "../../components/dashboard/user/User";
+import { useAuth } from "../../hooks/useAuth";
 
 export default function DashboardPage() {
   const [activeNav, setActiveNav] = useState("Dashboard");
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { user } = useAuth();
 
-  const renderContent = () => {
+  const renderContentAdmin = () => {
     switch (activeNav) {
       case "Dashboard":
         return <DashboardContent />;
@@ -26,6 +29,19 @@ export default function DashboardPage() {
         return <ProjectsPage />;
       default:
         return <DashboardContent />;
+    }
+  };
+
+  const renderContentUser = () => {
+    switch (activeNav) {
+      case "Dashboard":
+        return <User />;
+      case "Reports":
+        return <ReportsPage />;
+      case "Projects":
+        return <ProjectsPage />;
+      default:
+        return <User />;
     }
   };
 
@@ -41,11 +57,13 @@ export default function DashboardPage() {
           sidebarOpen={sidebarOpen}
           setSidebarOpen={setSidebarOpen}
         />
-        <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+        <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
           <Header activeNav={activeNav} setSidebarOpen={setSidebarOpen} />
 
           <main className="flex-1 overflow-y-auto p-6 lg:p-8">
-            {renderContent()}
+            {user?.data?.role === "admin"
+              ? renderContentAdmin()
+              : renderContentUser()}
           </main>
         </div>
       </div>

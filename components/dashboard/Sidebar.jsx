@@ -4,10 +4,16 @@ import { useAuth } from "../../hooks/useAuth";
 import { theme } from "../../lib/data";
 import { LayoutDashboard, FileText, Receipt, X, BrickWall } from "lucide-react";
 
-const navLinks = [
+const navLinksAdmin = [
   { label: "Dashboard", icon: <LayoutDashboard size={18} /> },
   { label: "Reports", icon: <FileText size={18} /> },
   { label: "Expenses", icon: <Receipt size={18} /> },
+  { label: "Projects", icon: <BrickWall size={18} /> },
+];
+
+const navLinksUser = [
+  { label: "Dashboard", icon: <LayoutDashboard size={18} /> },
+  { label: "Reports", icon: <FileText size={18} /> },
   { label: "Projects", icon: <BrickWall size={18} /> },
 ];
 
@@ -24,15 +30,11 @@ export default function Sidebar({
     <>
       <div
         onClick={() => setSidebarOpen(false)}
-        className={`fixed inset-0 z-20 lg:hidden bg-black/50 backdrop-blur-sm transition-opacity duration-300
-          ${sidebarOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}
+        className={`fixed inset-0 z-20 bg-black/50 backdrop-blur-sm transition-opacity duration-300 lg:hidden ${sidebarOpen ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0"}`}
       />
 
       <aside
-        className={`fixed top-0 left-0 h-full z-30 flex flex-col w-68 border-r
-          transition-transform duration-300 ease-in-out
-          ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}
-          lg:translate-x-0 lg:static lg:z-auto lg:shrink-0`}
+        className={`fixed top-0 left-0 z-30 flex h-full w-68 flex-col border-r transition-transform duration-300 ease-in-out ${sidebarOpen ? "translate-x-0" : "-translate-x-full"} lg:static lg:z-auto lg:shrink-0 lg:translate-x-0`}
         style={{
           backgroundColor: theme.dark,
           borderColor: "rgba(255,255,255,0.06)",
@@ -45,7 +47,7 @@ export default function Sidebar({
           style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}
         >
           <div
-            className="w-10 h-10 rounded-xl flex items-center justify-center text-white font-bold text-sm tracking-wide shadow-lg"
+            className="flex h-10 w-10 items-center justify-center rounded-xl text-sm font-bold tracking-wide text-white shadow-lg"
             style={{
               background: `linear-gradient(135deg, ${theme.green} 0%, ${theme.greenLight} 100%)`,
               boxShadow: `0 4px 16px ${theme.green}50`,
@@ -53,16 +55,16 @@ export default function Sidebar({
           >
             S
           </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-white font-semibold text-base leading-tight tracking-wide">
+          <div className="min-w-0 flex-1">
+            <p className="text-base leading-tight font-semibold tracking-wide text-white">
               Sayukha
             </p>
-            <p className="text-white/30 text-[10px] font-medium mt-0.5 tracking-widest uppercase">
+            <p className="mt-0.5 text-[10px] font-medium tracking-widest text-white/30 uppercase">
               Constrution LTD
             </p>
           </div>
           <button
-            className="lg:hidden text-white/30 hover:text-white/70 transition-colors p-1 rounded-lg hover:bg-white/5"
+            className="rounded-lg p-1 text-white/30 transition-colors hover:bg-white/5 hover:text-white/70 lg:hidden"
             onClick={() => setSidebarOpen(false)}
           >
             <X size={20} />
@@ -71,49 +73,82 @@ export default function Sidebar({
 
         {/* Section Label */}
         <div className="px-6 pt-6 pb-2">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.15em] text-white/25">
+          <p className="text-[10px] font-semibold tracking-[0.15em] text-white/25 uppercase">
             Main Menu
           </p>
         </div>
 
         {/* Nav Links */}
-        <nav className="flex-1 px-3 pb-4 space-y-0.5 overflow-y-auto">
-          {navLinks.map((link) => {
-            const isActive = activeNav === link.label;
-            return (
-              <button
-                key={link.label}
-                onClick={() => {
-                  setActiveNav(link.label);
-                  setSidebarOpen(false);
-                }}
-                className={`w-full flex cursor-pointer items-center gap-3.5 px-4 py-3 rounded-xl text-sm font-medium
-                  transition-all duration-200 group relative
-                  ${isActive ? "text-white shadow-lg" : "text-white/45 hover:text-white/90 hover:bg-white/5"}`}
-                style={
-                  isActive
-                    ? {
-                        background: `linear-gradient(135deg, ${theme.green}f0 0%, ${theme.greenLight}e0 100%)`,
-                        boxShadow: `0 4px 20px ${theme.green}45`,
-                      }
-                    : {}
-                }
-              >
-                {isActive && (
-                  <span
-                    className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 rounded-r-full"
-                    style={{ backgroundColor: "rgba(255,255,255,0.7)" }}
-                  />
-                )}
-                <span
-                  className={`transition-transform duration-200 ${!isActive && "group-hover:scale-110"}`}
-                >
-                  {link.icon}
-                </span>
-                <span className="flex-1 text-left">{link.label}</span>
-              </button>
-            );
-          })}
+        <nav className="flex-1 space-y-0.5 overflow-y-auto px-3 pb-4">
+          {role === "admin"
+            ? navLinksAdmin.map((link) => {
+                const isActive = activeNav === link.label;
+                return (
+                  <button
+                    key={link.label}
+                    onClick={() => {
+                      setActiveNav(link.label);
+                      setSidebarOpen(false);
+                    }}
+                    className={`group relative flex w-full cursor-pointer items-center gap-3.5 rounded-xl px-4 py-3 text-sm font-medium transition-all duration-200 ${isActive ? "text-white shadow-lg" : "text-white/45 hover:bg-white/5 hover:text-white/90"}`}
+                    style={
+                      isActive
+                        ? {
+                            background: `linear-gradient(135deg, ${theme.green}f0 0%, ${theme.greenLight}e0 100%)`,
+                            boxShadow: `0 4px 20px ${theme.green}45`,
+                          }
+                        : {}
+                    }
+                  >
+                    {isActive && (
+                      <span
+                        className="absolute top-1/2 left-0 h-5 w-0.5 -translate-y-1/2 rounded-r-full"
+                        style={{ backgroundColor: "rgba(255,255,255,0.7)" }}
+                      />
+                    )}
+                    <span
+                      className={`transition-transform duration-200 ${!isActive && "group-hover:scale-110"}`}
+                    >
+                      {link.icon}
+                    </span>
+                    <span className="flex-1 text-left">{link.label}</span>
+                  </button>
+                );
+              })
+            : navLinksUser.map((link) => {
+                const isActive = activeNav === link.label;
+                return (
+                  <button
+                    key={link.label}
+                    onClick={() => {
+                      setActiveNav(link.label);
+                      setSidebarOpen(false);
+                    }}
+                    className={`group relative flex w-full cursor-pointer items-center gap-3.5 rounded-xl px-4 py-3 text-sm font-medium transition-all duration-200 ${isActive ? "text-white shadow-lg" : "text-white/45 hover:bg-white/5 hover:text-white/90"}`}
+                    style={
+                      isActive
+                        ? {
+                            background: `linear-gradient(135deg, ${theme.green}f0 0%, ${theme.greenLight}e0 100%)`,
+                            boxShadow: `0 4px 20px ${theme.green}45`,
+                          }
+                        : {}
+                    }
+                  >
+                    {isActive && (
+                      <span
+                        className="absolute top-1/2 left-0 h-5 w-0.5 -translate-y-1/2 rounded-r-full"
+                        style={{ backgroundColor: "rgba(255,255,255,0.7)" }}
+                      />
+                    )}
+                    <span
+                      className={`transition-transform duration-200 ${!isActive && "group-hover:scale-110"}`}
+                    >
+                      {link.icon}
+                    </span>
+                    <span className="flex-1 text-left">{link.label}</span>
+                  </button>
+                );
+              })}
         </nav>
 
         <div
@@ -124,11 +159,11 @@ export default function Sidebar({
         {/* User Card */}
         <div className="px-4 py-5">
           <div
-            className="flex items-center gap-3 px-3 py-3 rounded-xl"
+            className="flex items-center gap-3 rounded-xl px-3 py-3"
             style={{ backgroundColor: "rgba(255,255,255,0.04)" }}
           >
             <div
-              className="w-9 h-9 rounded-full flex items-center justify-center text-white text-xs font-bold shrink-0"
+              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white"
               style={{
                 background: `linear-gradient(135deg, ${theme.green} 0%, ${theme.greenLight} 100%)`,
               }}
@@ -139,12 +174,12 @@ export default function Sidebar({
                 .join("")}
             </div>
             <div className="min-w-0 flex-1">
-              <p className="text-white/80 text-xs font-semibold truncate">
+              <p className="truncate text-xs font-semibold text-white/80">
                 {name}
               </p>
-              <p className="text-white/30 text-[10px] truncate">{role}</p>
+              <p className="truncate text-[10px] text-white/30">{role}</p>
             </div>
-            <div className="w-2 h-2 rounded-full bg-emerald-400 shrink-0 shadow-sm shadow-emerald-400/50" />
+            <div className="h-2 w-2 shrink-0 rounded-full bg-emerald-400 shadow-sm shadow-emerald-400/50" />
           </div>
         </div>
       </aside>
