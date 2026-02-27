@@ -13,7 +13,7 @@ export default function AuthContextProvider({ children }) {
   const getInitialUser = async () => {
     try {
       setIsLoading(true);
-      const res = await axios.get(`${apiUrl}/users/getMe`, {
+      const res = await axios.get(`${apiUrl}/users/get-me`, {
         withCredentials: true,
       });
       setUser(res.data);
@@ -34,7 +34,7 @@ export default function AuthContextProvider({ children }) {
       });
       axios.defaults.headers.common["Authorization"] =
         `Bearer ${res.data.token}`;
-      const userResponse = await axios.get(`${apiUrl}/users/getMe`, {
+      const userResponse = await axios.get(`${apiUrl}/users/get-me`, {
         withCredentials: true,
       });
       setUser(userResponse.data);

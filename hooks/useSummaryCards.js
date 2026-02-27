@@ -6,7 +6,7 @@ export default function useSummaryCards() {
   const { data: employees } = useFetch("employees", "/users");
   const { data: comparisonData, isLoading } = useFetch(
     "expense-comparison",
-    "/expenses/statsComparison",
+    "/expenses/stats-comparison",
   );
 
   const dayTotal = comparisonData?.data?.day?.current ?? 0;

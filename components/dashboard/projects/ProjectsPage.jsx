@@ -44,7 +44,7 @@ export default function ProjectsPage() {
   const queryClient = useQueryClient();
 
   const endPoint =
-    user?.data?.role === "admin" ? "/projects" : "/projects/myProjects";
+    user?.data?.role === "admin" ? "/projects" : "/projects/my-projects";
 
   const {
     data: projectData,
@@ -71,7 +71,7 @@ export default function ProjectsPage() {
 
   const mutation = useMutation({
     mutationFn: async (data) => {
-      await api.patch(`/projects/${data.project_id}/assignSupervisor`, {
+      await api.patch(`/projects/${data.project_id}/assign-supervisor`, {
         project_supervisor: data.employeeId,
       });
     },

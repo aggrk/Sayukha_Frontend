@@ -14,7 +14,7 @@ export default function MyExpense() {
     data: expenses,
     isLoading,
     isError,
-  } = useFetch("expenses", "/expenses/myExpenses", {
+  } = useFetch("expenses", "/expenses/my-expenses", {
     page: currentPage,
     limit: LIMIT,
   });

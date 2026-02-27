@@ -9,11 +9,11 @@ import {
   ChevronDown,
   LogOut,
   Menu,
-  MessageCircleMore,
   Search,
   Settings,
   User,
 } from "lucide-react";
+import useFetch from "../../hooks/useFetch";
 
 export default function Header({ activeNav, setSidebarOpen }) {
   const [profileOpen, setProfileOpen] = useState(false);
@@ -21,6 +21,13 @@ export default function Header({ activeNav, setSidebarOpen }) {
   const dropRef = useRef(null);
   const { user, logout } = useAuth();
   const { name, email, role } = user?.data;
+  const { data: unreadCount } = useFetch(
+    "notifications-unread-count",
+    "/notifications/unread-count",
+  );
+
+  // The actual number from the API response
+  const count = unreadCount?.data?.unread_count ?? 0;
 
   useEffect(() => {
     function handleClickOutside(e) {
@@ -123,16 +130,22 @@ export default function Header({ activeNav, setSidebarOpen }) {
           </span>
 
           {/* Notification Bell */}
-          <button
+          <Link
+            href="/dashboard/notifications"
             className="relative rounded-xl p-2.5 text-gray-400 transition-all duration-200 hover:bg-gray-100 hover:text-gray-700"
             aria-label="Notifications"
           >
             <Bell />
-            <span
-              className="absolute top-2 right-2 h-2 w-2 rounded-full border-2 border-white"
-              style={{ backgroundColor: theme.red }}
-            />
-          </button>
+            {/* Only render the dot when there are unread notifications */}
+            {count > 0 && (
+              <span
+                className="absolute top-1.5 right-1.5 flex h-4 w-4 items-center justify-center rounded-full border-2 border-white text-[9px] font-bold text-white"
+                style={{ backgroundColor: theme.red }}
+              >
+                {count > 9 ? "9+" : count}
+              </span>
+            )}
+          </Link>
 
           {/* Divider */}
           <div
@@ -198,7 +211,6 @@ export default function Header({ activeNav, setSidebarOpen }) {
                       icon: <Settings />,
                       link: "/dashboard/settings",
                     },
-                    // { label: "Help & Support", icon: <MessageCircleMore /> },
                   ].map((item) => (
                     <Link
                       href={item.link}

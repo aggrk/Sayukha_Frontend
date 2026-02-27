@@ -16,7 +16,7 @@ export default function DeleteAccountCard() {
     setIsDeleting(true);
     setErrorMsg("");
     try {
-      await api.delete("/users/deleteMe");
+      await api.delete("/users/delete-me");
       if (logout) logout();
     } catch (err) {
       setErrorMsg(

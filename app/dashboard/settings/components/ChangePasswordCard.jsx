@@ -27,7 +27,7 @@ export default function ChangePasswordCard() {
     setSuccessMsg("");
     setErrorMsg("");
     try {
-      await api.patch("/users/updateMyPassword", {
+      await api.patch("/users/update-my-password", {
         current_password: data.current_password,
         new_password: data.new_password,
       });

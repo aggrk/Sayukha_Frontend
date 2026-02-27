@@ -2,14 +2,15 @@
 
 import { AuthenticationContext } from "../../context/AuthContext";
 import { useRouter } from "next/navigation";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { useForm } from "react-hook-form";
 import Image from "next/image";
-import { Loader2 } from "lucide-react";
+import { Loader2, Eye, EyeOff } from "lucide-react";
 
 export default function LoginPage() {
   const router = useRouter();
   const { login, isLoading } = useContext(AuthenticationContext);
+  const [showPassword, setShowPassword] = useState(false);
 
   const {
     register,
@@ -30,21 +31,21 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen bg-[#0F0F0F] text-[#FAFAFA]">
+    <div className="bg-dark text-white-soft flex min-h-screen">
       <Sidebar />
 
       <div className="flex flex-1 items-center justify-center px-8">
         <div className="w-full max-w-md">
-          <p className="mb-3 text-sm font-medium tracking-widest text-[#0E7A3E] uppercase">
+          <p className="text-green-light mb-3 text-sm font-medium tracking-widest uppercase">
             Staff Portal
           </p>
-          <h1 className="mb-8 text-3xl font-semibold text-[#FAFAFA]">
+          <h1 className="text-white-soft mb-8 text-3xl font-semibold">
             Sign In
           </h1>
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             <div>
-              <label className="mb-2 block text-sm text-[#D1D5DB]">
+              <label className="text-gray-soft mb-2 block text-sm">
                 Email Address
               </label>
               <input
@@ -57,7 +58,7 @@ export default function LoginPage() {
                     message: "Enter a valid email address",
                   },
                 })}
-                className="w-full rounded-lg border border-white/10 bg-[#1A1A1A] px-5 py-4 text-[#FAFAFA] transition-all duration-200 placeholder:text-white/20 focus:border-[#0B6B3A] focus:ring-1 focus:ring-[#0B6B3A] focus:outline-none aria-invalid:border-red-500 aria-invalid:ring-red-500"
+                className="text-white-soft focus:ring-green focus:border-green bg-dark w-full rounded-lg border border-white/10 px-5 py-4 transition-all duration-200 placeholder:text-white/20 focus:ring-1 focus:outline-none aria-invalid:border-red-500 aria-invalid:ring-red-500"
                 aria-invalid={errors.email ? "true" : "false"}
               />
               {errors.email && (
@@ -69,27 +70,39 @@ export default function LoginPage() {
 
             <div>
               <div className="mb-2 flex items-center justify-between">
-                <label className="text-sm text-[#D1D5DB]">Password</label>
+                <label className="text-gray-soft text-sm">Password</label>
                 <a
                   href="/forgot-password"
-                  className="text-xs text-[#D1D5DB]/50 transition-colors duration-200 hover:text-[#0E7A3E]"
+                  className="hover:text-green-light text-gray-soft/50 text-xs transition-colors duration-200"
                 >
                   Forgot password?
                 </a>
               </div>
-              <input
-                type="password"
-                placeholder="Enter your password"
-                {...register("password", {
-                  required: "Password is required",
-                  minLength: {
-                    value: 6,
-                    message: "Password must be at least 6 characters",
-                  },
-                })}
-                className="w-full rounded-lg border border-white/10 bg-[#1A1A1A] px-5 py-4 text-[#FAFAFA] transition-all duration-200 placeholder:text-white/20 focus:border-[#0B6B3A] focus:ring-1 focus:ring-[#0B6B3A] focus:outline-none aria-invalid:border-red-500 aria-invalid:ring-red-500"
-                aria-invalid={errors.password ? "true" : "false"}
-              />
+
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Enter your password"
+                  {...register("password", {
+                    required: "Password is required",
+                    minLength: {
+                      value: 6,
+                      message: "Password must be at least 6 characters",
+                    },
+                  })}
+                  className="text-white-soft focus:border-green focus:ring-green bg-dark w-full rounded-lg border border-white/10 px-5 py-4 pr-12 transition-all duration-200 placeholder:text-white/20 focus:ring-1 focus:outline-none aria-invalid:border-red-500 aria-invalid:ring-red-500"
+                  aria-invalid={errors.password ? "true" : "false"}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((prev) => !prev)}
+                  className="absolute top-1/2 right-4 -translate-y-1/2 text-white/30 transition-colors duration-200 hover:text-white/70"
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
+
               {errors.password && (
                 <p className="mt-1.5 text-xs text-red-400">
                   {errors.password.message}
@@ -117,7 +130,7 @@ export default function LoginPage() {
             </button>
           </form>
 
-          <p className="mt-8 text-center text-sm text-[#D1D5DB] opacity-50">
+          <p className="text-gray-soft mt-8 text-center text-sm opacity-50">
             Authorised personnel only.
           </p>
         </div>
@@ -128,7 +141,7 @@ export default function LoginPage() {
 
 function Sidebar() {
   return (
-    <div className="hidden w-2/5 flex-col justify-center border-r border-white/5 bg-[#1A1A1A] px-20 lg:flex">
+    <div className="bg-dark hidden w-2/5 flex-col justify-center border-r border-white/5 px-20 lg:flex">
       <div className="mb-20 flex items-center gap-4">
         <div className="flex h-16 w-16 items-center justify-center">
           <Image
@@ -140,10 +153,10 @@ function Sidebar() {
           />
         </div>
         <div>
-          <p className="text-lg font-semibold tracking-wide text-[#FAFAFA]">
+          <p className="text-white-soft text-lg font-semibold tracking-wide">
             SAYUKHA
           </p>
-          <p className="text-xs tracking-widest text-[#D1D5DB] uppercase opacity-60">
+          <p className="text-gray-soft text-xs tracking-widest uppercase opacity-60">
             Construction Ltd
           </p>
         </div>
@@ -153,9 +166,9 @@ function Sidebar() {
         <h2 className="mb-6 text-4xl leading-tight font-semibold">
           Sayukha Management System
           <br />
-          <span className="text-[#0E7A3E]">Staff Portal</span>
+          <span className="text-green-light">Staff Portal</span>
         </h2>
-        <p className="text-base leading-relaxed text-[#D1D5DB] opacity-80">
+        <p className="text-gray-soft text-base leading-relaxed opacity-80">
           Secure internal system for overseeing infrastructure projects,
           financial operations and reporting.
         </p>

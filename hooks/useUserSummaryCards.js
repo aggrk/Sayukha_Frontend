@@ -9,19 +9,21 @@ export default function useUserSummaryCards() {
   const userId = user?.data?.id;
   console.log(user);
 
-  const { data: userReports } = useFetch("user-reports", "/reports/myReports", {
-    prepared_by: userId,
-  });
-  const { data: userProjects } = useFetch("projects", "/projects/myProjects", {
+  const { data: userReports } = useFetch(
+    "user-reports",
+    "/reports/my-reports",
+    {
+      prepared_by: userId,
+    },
+  );
+  const { data: userProjects } = useFetch("projects", "/projects/my-projects", {
     prepared_by: userId,
   });
   const { data: userExpenses, isLoading } = useFetch(
     "user-expenses",
-    "/expenses/myExpense",
+    "/expenses/my-expenses",
     { paid_by: userId },
   );
-
-  console.log(userExpenses);
 
   const expenseCount = userExpenses?.results ?? 0;
   const reportCount = userReports?.results ?? 0;

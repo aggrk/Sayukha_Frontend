@@ -84,7 +84,7 @@ export default function ProfilePage() {
   } = useForm({ defaultValues: { name, email, phone } });
 
   const { mutate, isPending, isSuccess, isError, error } = useMutation({
-    mutationFn: (data) => api.patch("/users/updateMe", data),
+    mutationFn: (data) => api.patch("/users/update-me", data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["employees"] });
       setIsEditing(false);

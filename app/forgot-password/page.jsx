@@ -20,7 +20,7 @@ export default function ForgotPasswordPage() {
 
   const onSubmit = async (data) => {
     try {
-      await api.post("/users/forgotPassword", { email: data.email });
+      await api.post("/users/forgot-password", { email: data.email });
       setSubmittedEmail(data.email);
       setSubmitted(true);
     } catch (err) {

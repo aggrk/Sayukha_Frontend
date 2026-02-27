@@ -35,7 +35,7 @@ export default function ActionDropdown({
         onClick={onToggle}
         className="border-gray-low-soft flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-semibold text-[#6b7280] transition-all hover:bg-gray-50 active:scale-95"
       >
-        Choose Supervisor
+        {project.project_supervisor ? "Change Supervisor" : "Choose Supervisor"}
         <ChevronDown
           size={13}
           className={`transition-transform duration-200 ${isOpen ? "rotate-180" : "rotate-0"}`}
