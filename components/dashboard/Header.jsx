@@ -132,7 +132,7 @@ export default function Header({ activeNav, setSidebarOpen }) {
           {/* Notification Bell */}
           <Link
             href="/dashboard/notifications"
-            className="relative rounded-xl p-2.5 text-gray-400 transition-all duration-200 hover:bg-gray-100 hover:text-gray-700"
+            className="relative cursor-pointer rounded-xl p-2.5 text-gray-400 transition-all duration-200 hover:bg-gray-100 hover:text-gray-700"
             aria-label="Notifications"
           >
             <Bell />

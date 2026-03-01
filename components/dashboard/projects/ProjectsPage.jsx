@@ -54,7 +54,6 @@ export default function ProjectsPage() {
     page: currentPage,
     limit: LIMIT,
   });
-  console.log(projectData);
 
   const projects = projectData?.data ?? [];
   const totalCount = projectData?.results ?? 0;
