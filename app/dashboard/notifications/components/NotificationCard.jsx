@@ -1,5 +1,12 @@
 import { formatDate } from "../../../../lib/utils";
-import { BarChart2, Bell, Briefcase, Check, Trash2 } from "lucide-react";
+import {
+  BarChart2,
+  Bell,
+  Briefcase,
+  Check,
+  Receipt,
+  Trash2,
+} from "lucide-react";
 
 export default function NotificationCard({
   notification,
