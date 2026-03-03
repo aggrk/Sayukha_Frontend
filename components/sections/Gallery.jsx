@@ -9,10 +9,10 @@ export function Gallery() {
     <section id="gallery" className="bg-dark px-[8vw] py-24">
       {/* Header */}
       <FadeUp>
-        <div className="mb-16 flex flex-wrap items-end justify-between gap-6">
+        <div className="mb-12 flex flex-wrap items-end justify-between gap-4 sm:mb-16 sm:gap-6">
           <div>
             <SectionLabel text="Our Works" />
-            <h2 className="font-heading text-white-soft text-[clamp(36px,4vw,64px)] leading-none font-black">
+            <h2 className="font-heading text-white-soft text-[clamp(28px,5vw,64px)] leading-snug font-black sm:leading-none">
               BUILT BY US.
               <br />
               <span className="text-red">PROOF IN EVERY FRAME.</span>
@@ -44,7 +44,7 @@ export function Gallery() {
         <div className="mt-12 flex justify-center">
           <a
             href="#contact"
-            className="bg-red font-heading clip-notch hover:bg-red-dark inline-flex items-center gap-3 px-9 py-4 text-[15px] font-bold tracking-[0.12em] text-white uppercase no-underline transition-all hover:-translate-y-0.5"
+            className="bg-red font-heading clip-notch hover:bg-red-dark inline-flex w-full flex-wrap items-center justify-center gap-2 px-4 py-3 text-sm font-bold tracking-[0.12em] text-white uppercase no-underline transition-all hover:-translate-y-0.5 sm:w-auto sm:gap-3 sm:px-9 sm:py-4 sm:text-[15px]"
           >
             Start a Project With Us →
           </a>

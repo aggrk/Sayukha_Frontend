@@ -39,30 +39,30 @@ export function About() {
       {/* Content */}
       <div>
         <SectionLabel text="Who We Are" />
-        <h2 className="font-heading text-white-soft mb-6 text-[clamp(36px,3.5vw,60px)] leading-none font-black">
+        <h2 className="font-heading text-white-soft mb-6 text-[clamp(28px,5vw,60px)] leading-snug font-black sm:leading-none">
           BUILT ON <span className="text-green">VALUES.</span>
           <br />
           DRIVEN BY PURPOSE.
         </h2>
-        <p className="text-gray-soft mb-6 text-base leading-[1.8]">
+        <p className="text-gray-soft mb-6 text-sm leading-[1.6] sm:text-base sm:leading-[1.8]">
           Sayukha Construction Company Limited is one of Tanzania's
           fastest-growing multi-engineering and supplies firms. We serve
           individuals, public and private institutions, and local and foreign
           investors — primarily within the mining and geology sectors — across
           Tanzania.
         </p>
-        <p className="text-gray-soft mb-10 text-base leading-[1.8]">
+        <p className="text-gray-soft mb-10 text-sm leading-[1.6] sm:text-base sm:leading-[1.8]">
           Our team is continuously trained on the latest technologies and
           industry trends, equipping us with the knowledge and skill to tackle
           any challenge our clients bring — with safety as a non-negotiable
           foundation in everything we do.
         </p>
 
-        <div className="grid grid-cols-2 gap-0.5">
+        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
           {strengths.map((strength, index) => (
             <FadeUp key={strength.id} delay={index * 0.1}>
               <div className="bg-dark border-green border-l-[3px] p-6">
-                <h4 className="font-heading mb-1.5 text-lg font-black tracking-[0.05em] text-white uppercase">
+                <h4 className="font-heading wrap-break-words mb-1.5 text-base font-black tracking-[0.05em] text-white uppercase sm:text-lg">
                   {strength.title}
                 </h4>
                 <p className="text-gray-soft text-[13px] leading-[1.6]">

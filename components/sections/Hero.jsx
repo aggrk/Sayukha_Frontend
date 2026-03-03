@@ -24,16 +24,6 @@ export function Hero() {
         `,
       }}
     >
-      {/* Diagonal accent line */}
-      <div
-        className="absolute top-0 right-[42%] h-full w-px opacity-30"
-        style={{
-          background:
-            "linear-gradient(to bottom, transparent, #0B6B3A 30%, #0B6B3A 70%, transparent)",
-          transform: "skewX(-8deg)",
-        }}
-      />
-
       {/* Left: Content */}
       <div className="relative z-10 flex flex-col justify-center px-[8vw] py-20">
         <FadeUp>
@@ -73,29 +63,28 @@ export function Hero() {
         </FadeUp>
 
         <FadeUp delay={0.3}>
-          <div className="mb-14 flex flex-wrap gap-4">
+          <div className="mb-14 flex flex-col flex-wrap gap-3 sm:flex-row sm:gap-4">
             <Link
               href="#contact"
-              className="bg-red font-heading clip-notch hover:bg-red-dark inline-flex items-center gap-3 px-9 py-4 text-[15px] font-bold tracking-[0.12em] text-white uppercase no-underline transition-all hover:-translate-y-0.5"
+              className="bg-red font-heading clip-notch hover:bg-red-dark inline-flex w-full flex-wrap items-center gap-2 px-4 py-3 text-sm font-bold tracking-[0.12em] text-white uppercase no-underline transition-all hover:-translate-y-0.5 sm:w-auto sm:gap-3 sm:px-9 sm:py-4 sm:text-[15px]"
             >
               <ArrowRight size={18} strokeWidth={2.5} />
               Request a Quote
             </Link>
             <Link
               href="#services"
-              className="text-green-light font-heading clip-notch border-green/60 hover:bg-green/10 inline-flex items-center gap-3 border bg-transparent px-9 py-4 text-[15px] font-bold tracking-[0.12em] uppercase no-underline transition-all hover:-translate-y-0.5"
+              className="text-green-light font-heading clip-notch border-green/60 hover:bg-green/10 inline-flex w-full flex-wrap items-center gap-2 border bg-transparent px-4 py-3 text-sm font-bold tracking-[0.12em] uppercase no-underline transition-all hover:-translate-y-0.5 sm:w-auto sm:gap-3 sm:px-9 sm:py-4 sm:text-[15px]"
             >
               <Play size={18} strokeWidth={2.5} />
               Explore Our Services
             </Link>
           </div>
         </FadeUp>
-
         <FadeUp delay={0.4}>
-          <div className="flex gap-10">
+          <div className="flex items-center justify-center gap-6 sm:flex-row sm:gap-10">
             {heroStats.map((stat) => (
-              <div key={stat.label}>
-                <div className="font-heading text-4xl leading-none font-black text-white">
+              <div key={stat.label} className="text-center">
+                <div className="font-heading text-4xl leading-none font-black text-white sm:text-5xl">
                   {stat.value}
                 </div>
                 <div className="text-gray-soft mt-1 text-[11px] font-medium tracking-[0.15em] uppercase">
