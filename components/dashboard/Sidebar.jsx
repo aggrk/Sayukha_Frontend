@@ -2,13 +2,21 @@
 
 import { useAuth } from "../../hooks/useAuth";
 import { theme } from "../../lib/data";
-import { LayoutDashboard, FileText, Receipt, X, BrickWall } from "lucide-react";
+import {
+  LayoutDashboard,
+  FileText,
+  Receipt,
+  X,
+  BrickWall,
+  DollarSign,
+} from "lucide-react";
 
 const navLinksAdmin = [
   { label: "Dashboard", icon: <LayoutDashboard size={18} /> },
   { label: "Reports", icon: <FileText size={18} /> },
   { label: "Expenses", icon: <Receipt size={18} /> },
   { label: "Projects", icon: <BrickWall size={18} /> },
+  { label: "Salary Payments", icon: <DollarSign size={18} /> },
 ];
 
 const navLinksUser = [

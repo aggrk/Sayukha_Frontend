@@ -12,6 +12,8 @@ export default function ActionDropdown({
 }) {
   const ref = useRef();
 
+  console.log(employee);
+
   useEffect(() => {
     if (!isOpen) return;
     function handleOutside(e) {
@@ -42,19 +44,19 @@ export default function ActionDropdown({
     <div className="relative" ref={ref}>
       <button
         onClick={onToggle}
-        className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg border transition-all hover:bg-gray-50 active:scale-95 border-gray-low-soft text-[#6b7280]"
+        className="border-gray-low-soft flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-semibold text-[#6b7280] transition-all hover:bg-gray-50 active:scale-95"
       >
         More
         <ChevronDown
           size={13}
-          className={`duration-200 transition-transform ${isOpen ? "rotate-180" : "rotate-0"}`}
+          className={`transition-transform duration-200 ${isOpen ? "rotate-180" : "rotate-0"}`}
           style={{ transform: isOpen ? "rotate(180deg)" : "rotate(0deg)" }}
         />
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 top-[calc(100%+6px)] border-[#e5e7eb] w-56 rounded-2xl shadow-xl border z-20 overflow-hidden bg-white">
-          <p className="px-4 py-2.5 text-[10px] border-[#f3f4f6] font-bold uppercase tracking-widest text-gray-400 border-b">
+        <div className="absolute top-[calc(100%+6px)] right-0 z-20 w-56 overflow-hidden rounded-2xl border border-[#e5e7eb] bg-white shadow-xl">
+          <p className="border-b border-[#f3f4f6] px-4 py-2.5 text-[10px] font-bold tracking-widest text-gray-400 uppercase">
             Salary Actions
           </p>
           {actions.map((action) => (
@@ -64,16 +66,16 @@ export default function ActionDropdown({
                 onSelectAction(action.type);
                 onClose();
               }}
-              className="w-full text-left px-4 py-3 hover:bg-gray-50 flex items-start gap-3 transition-colors group"
+              className="group flex w-full items-start gap-3 px-4 py-3 text-left transition-colors hover:bg-gray-50"
             >
-              <span className="mt-0.5 group-hover:scale-110 transition-transform text-green">
+              <span className="text-green mt-0.5 transition-transform group-hover:scale-110">
                 {action.icon}
               </span>
               <div>
                 <p className="text-sm font-semibold text-gray-700">
                   {action.label}
                 </p>
-                <p className="text-[11px] text-gray-400 mt-0.5">
+                <p className="mt-0.5 text-[11px] text-gray-400">
                   {action.desc}
                 </p>
               </div>

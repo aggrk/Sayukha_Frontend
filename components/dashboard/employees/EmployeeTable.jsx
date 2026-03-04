@@ -97,31 +97,31 @@ export default function EmployeeTable() {
         />
       )}
 
-      <section className="rounded-2xl border bg-white-soft border-gray-low-soft overflow-hidden font-body shadow-sm">
+      <section className="bg-white-soft border-gray-low-soft font-body overflow-hidden rounded-2xl border shadow-sm">
         {/* Header */}
-        <div className="px-7 py-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-gray-low-soft border-b">
+        <div className="border-gray-low-soft flex flex-col justify-between gap-4 border-b px-7 py-5 sm:flex-row sm:items-center">
           <div>
-            <h2 className="text-lg font-semibold text-gray-900 font-heading">
+            <h2 className="font-heading text-lg font-semibold text-gray-900">
               Employee Records
             </h2>
-            <div className="flex items-center gap-2 mt-0.5">
+            <div className="mt-0.5 flex items-center gap-2">
               <p className="text-sm text-gray-400">{totalCount} total</p>
-              <span className="w-1 h-1 rounded-full bg-gray-300" />
-              <span className="text-sm font-medium text-green">
+              <span className="h-1 w-1 rounded-full bg-gray-300" />
+              <span className="text-green text-sm font-medium">
                 {activeCount} active
               </span>
             </div>
           </div>
 
           <div className="flex items-center gap-3">
-            <div className="flex items-center gap-1 p-1 rounded-xl border text-xs border-gray-low-soft bg-gray-low-light">
+            <div className="border-gray-low-soft bg-gray-low-light flex items-center gap-1 rounded-xl border p-1 text-xs">
               {["All", "Active", "Inactive"].map((s) => (
                 <button
                   key={s}
                   onClick={() => setFilterStatus(s)}
-                  className={`px-3 cursor-pointer py-1.5 rounded-lg font-semibold transition-all duration-150 ${
+                  className={`cursor-pointer rounded-lg px-3 py-1.5 font-semibold transition-all duration-150 ${
                     filterStatus === s
-                      ? "bg-white text-green shadow-[0_1px_3px_rgba(0,0,0,0.08)]"
+                      ? "text-green bg-white shadow-[0_1px_3px_rgba(0,0,0,0.08)]"
                       : "bg-transparent text-gray-400"
                   }`}
                 >
@@ -132,7 +132,7 @@ export default function EmployeeTable() {
 
             <button
               onClick={() => setShowAddUser(true)}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold text-white transition-all hover:opacity-90 active:scale-[0.97] shadow-sm bg-linear-to-br from-green to-green-light cursor-pointer"
+              className="from-green to-green-light flex cursor-pointer items-center gap-2 rounded-xl bg-linear-to-br px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-all hover:opacity-90 active:scale-[0.97]"
             >
               <Plus size={15} />
               Add New
@@ -143,7 +143,7 @@ export default function EmployeeTable() {
         {/* Table */}
         <div className="overflow-x-auto">
           {isLoading ? (
-            <div className="flex items-center justify-center py-20 gap-2 text-gray-400">
+            <div className="flex items-center justify-center gap-2 py-20 text-gray-400">
               <Loader2 size={18} className="animate-spin" />
               <span className="text-sm">Loading employees...</span>
             </div>
@@ -161,7 +161,7 @@ export default function EmployeeTable() {
                   ].map((col) => (
                     <th
                       key={col}
-                      className="px-6 py-3.5 text-left text-[10px] font-bold uppercase tracking-widest text-[#9ca3af]"
+                      className="px-6 py-3.5 text-left text-[10px] font-bold tracking-widest text-[#9ca3af] uppercase"
                     >
                       {col}
                     </th>
@@ -177,18 +177,18 @@ export default function EmployeeTable() {
                   return (
                     <tr
                       key={emp.id}
-                      className="border-t transition-colors hover:bg-gray-50/70 group border-gray-low-soft"
+                      className="group border-gray-low-soft border-t transition-colors hover:bg-gray-50/70"
                     >
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3.5">
-                          <div className="w-10 h-10 rounded-xl flex items-center justify-center text-white text-xs font-bold shrink-0 shadow-sm bg-green">
+                          <div className="bg-green flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-xs font-bold text-white shadow-sm">
                             {getInitials(emp.name)}
                           </div>
                           <div>
                             <p className="text-sm font-semibold text-gray-800">
                               {emp.name}
                             </p>
-                            <p className="text-xs text-gray-400 mt-0.5">
+                            <p className="mt-0.5 text-xs text-gray-400">
                               {emp.email}
                             </p>
                           </div>
@@ -196,13 +196,13 @@ export default function EmployeeTable() {
                       </td>
 
                       <td className="px-6 py-4">
-                        <span className="text-xs font-mono font-semibold px-2.5 py-1.5 rounded-lg bg-gray-low-light text-[#6b7280]">
+                        <span className="bg-gray-low-light rounded-lg px-2.5 py-1.5 font-mono text-xs font-semibold text-[#6b7280]">
                           {emp.account_number ?? "—"}
                         </span>
                       </td>
 
                       <td className="px-6 py-4">
-                        <span className="text-xs font-medium px-2.5 py-1.5 rounded-lg bg-gray-low-light text-[#6b7280]">
+                        <span className="bg-gray-low-light rounded-lg px-2.5 py-1.5 text-xs font-medium text-[#6b7280]">
                           {emp.position ?? "—"}
                         </span>
                       </td>
@@ -216,10 +216,10 @@ export default function EmployeeTable() {
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-2">
                           <span
-                            className={`w-1.5 h-1.5 rounded-full shrink-0 ${status === "active" ? "bg-active-dot" : "bg-inactive-dot"}`}
+                            className={`h-1.5 w-1.5 shrink-0 rounded-full ${status === "active" ? "bg-active-dot" : "bg-inactive-dot"}`}
                           />
                           <span
-                            className={`text-xs font-semibold px-2.5 py-1 rounded-full ${status === "active" ? "bg-[#dcfce7] text-active" : "bg-[#fee2e2] text-inactive"}`}
+                            className={`rounded-full px-2.5 py-1 text-xs font-semibold ${status === "active" ? "text-active bg-[#dcfce7]" : "text-inactive bg-[#fee2e2]"}`}
                           >
                             {status === "active" ? "Active" : "Inactive"}
                           </span>
@@ -230,7 +230,7 @@ export default function EmployeeTable() {
                         <div className="flex items-center gap-2">
                           <button
                             onClick={() => setUpdateEmployee(emp)}
-                            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg text-white transition-all hover:opacity-90 active:scale-95 shadow-sm bg-linear-to-br from-green to-green-light cursor-pointer"
+                            className="from-green to-green-light flex cursor-pointer items-center gap-1.5 rounded-lg bg-linear-to-br px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition-all hover:opacity-90 active:scale-95"
                           >
                             <Edit2 size={12} />
                             Update
@@ -238,7 +238,7 @@ export default function EmployeeTable() {
 
                           <button
                             onClick={() => setDeleteEmployee(emp)}
-                            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg text-white transition-all hover:opacity-90 active:scale-95 shadow-sm cursor-pointer bg-linear-to-br from-red to-red-dark"
+                            className="from-red to-red-dark flex cursor-pointer items-center gap-1.5 rounded-lg bg-linear-to-br px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition-all hover:opacity-90 active:scale-95"
                           >
                             <Trash2 size={12} />
                             Delete
@@ -264,13 +264,13 @@ export default function EmployeeTable() {
 
           {!isLoading && filtered.length === 0 && (
             <div className="py-16 text-center">
-              <div className="w-12 h-12 rounded-2xl flex items-center justify-center mx-auto mb-3 bg-gray-low-light">
+              <div className="bg-gray-low-light mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-2xl">
                 <User size={20} className="text-gray-400" />
               </div>
               <p className="text-sm font-semibold text-gray-600">
                 No employees found
               </p>
-              <p className="text-xs text-gray-400 mt-1">
+              <p className="mt-1 text-xs text-gray-400">
                 Try changing the filter or add a new employee
               </p>
             </div>

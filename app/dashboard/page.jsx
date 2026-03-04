@@ -11,6 +11,7 @@ import Header from "../../components/dashboard/Header";
 import ProjectsPage from "../../components/dashboard/projects/ProjectsPage";
 import User from "../../components/dashboard/user/User";
 import { useAuth } from "../../hooks/useAuth";
+import SalaryPayments from "../../components/dashboard/salary/SalaryPayments";
 
 export default function DashboardPage() {
   const [activeNav, setActiveNav] = useState("Dashboard");
@@ -27,6 +28,8 @@ export default function DashboardPage() {
         return <ExpensesPage />;
       case "Projects":
         return <ProjectsPage />;
+      case "Salary Payments":
+        return <SalaryPayments />;
       default:
         return <DashboardContent />;
     }
