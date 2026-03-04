@@ -20,7 +20,6 @@ export default function ResetPasswordPage({ params }) {
   const [showConfirm, setShowConfirm] = useState(false);
 
   const { token } = use(params);
-  console.log(token);
 
   const {
     register,
@@ -34,7 +33,7 @@ export default function ResetPasswordPage({ params }) {
 
   const onSubmit = async (data) => {
     try {
-      await api.patch(`/users/reset-password/${token}`, {
+      await api.patch(`/users/reset-password-on-registration/${token}`, {
         password: data.password,
         confirmPassword: data.confirmPassword,
       });
