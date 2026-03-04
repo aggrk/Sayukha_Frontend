@@ -13,9 +13,9 @@ export function Gallery() {
           <div>
             <SectionLabel text="Our Works" />
             <h2 className="font-heading text-white-soft text-[clamp(28px,5vw,64px)] leading-snug font-black sm:leading-none">
-              BUILT BY US.
+              OUR TEAM
               <br />
-              <span className="text-red">PROOF IN EVERY FRAME.</span>
+              <span className="text-red">AT WORK.</span>
             </h2>
           </div>
         </div>

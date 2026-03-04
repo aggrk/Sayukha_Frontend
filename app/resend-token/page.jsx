@@ -6,7 +6,7 @@ import Link from "next/link";
 import api from "../../lib/api";
 import { Loader2, ArrowLeft, MailCheck } from "lucide-react";
 
-export default function ForgotPasswordPage() {
+export default function ResendToken() {
   const [submitted, setSubmitted] = useState(false);
   const [submittedEmail, setSubmittedEmail] = useState("");
 
@@ -19,7 +19,9 @@ export default function ForgotPasswordPage() {
 
   const onSubmit = async (data) => {
     try {
-      await api.post("/users/forgot-password", { email: data.email });
+      await api.post("/users/resend-reset-password-email", {
+        email: data.email,
+      });
       setSubmittedEmail(data.email);
       setSubmitted(true);
     } catch (err) {
@@ -34,7 +36,6 @@ export default function ForgotPasswordPage() {
     <div className="text-white-soft flex min-h-screen bg-black">
       <div className="flex flex-1 items-center justify-center px-8">
         <div className="w-full max-w-md">
-          {/* Back to login */}
           <Link
             href="/login"
             className="text-gray-soft/40 hover:text-green-light mb-10 inline-flex items-center gap-2 text-xs tracking-widest uppercase transition-colors duration-200"
@@ -45,11 +46,8 @@ export default function ForgotPasswordPage() {
 
           {!submitted ? (
             <>
-              <p className="text-green-light mb-3 text-sm font-medium tracking-widest uppercase">
-                Account Recovery
-              </p>
               <h1 className="text-white-soft mb-3 text-3xl font-semibold">
-                Forgot Password
+                Resend Token
               </h1>
               <p className="text-gray-soft/60 mb-8 text-sm leading-relaxed">
                 Enter your registered email address and we'll send you a link to
@@ -98,7 +96,7 @@ export default function ForgotPasswordPage() {
                   {isSubmitting ? (
                     <Loader2 size={18} className="animate-spin" />
                   ) : (
-                    "Send Reset Link"
+                    "Send Token"
                   )}
                 </button>
               </form>

@@ -66,13 +66,15 @@ export default function MyExpense() {
             <Plus size={16} />
             Add Expense
           </button>
-          <button
-            onClick={handleExportExcel}
-            className="text-green inline-flex cursor-pointer items-center gap-2 rounded-xl border border-gray-200 bg-white px-5 py-2.5 text-sm font-semibold whitespace-nowrap shadow-sm transition-all duration-200 hover:-translate-y-px hover:bg-gray-50"
-          >
-            <Download size={16} />
-            Export Excel
-          </button>
+          {expenses?.data?.length > 0 && (
+            <button
+              onClick={handleExportExcel}
+              className="text-green inline-flex cursor-pointer items-center gap-2 rounded-xl border border-gray-200 bg-white px-5 py-2.5 text-sm font-semibold whitespace-nowrap shadow-sm transition-all duration-200 hover:-translate-y-px hover:bg-gray-50"
+            >
+              <Download size={16} />
+              Export Excel
+            </button>
+          )}
         </div>
       </div>
       {/* Loading */}
@@ -93,9 +95,6 @@ export default function MyExpense() {
       {/* Empty */}
       {!isLoading && !isError && records.length === 0 && (
         <div className="flex flex-col items-center justify-center gap-3 rounded-2xl bg-white py-16 shadow-sm">
-          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-green-50">
-            <Download size={22} className="text-green" />
-          </div>
           <p className="text-sm text-gray-400">No expenses found.</p>
           <button
             onClick={() => setShowAddModal(true)}

@@ -33,7 +33,7 @@ export default function ResetPasswordPage({ params }) {
 
   const onSubmit = async (data) => {
     try {
-      await api.patch(`/users/reset-password-on-registration/${token}`, {
+      await api.patch(`/users/reset-password/${token}`, {
         password: data.password,
         confirmPassword: data.confirmPassword,
       });
@@ -61,6 +61,9 @@ export default function ResetPasswordPage({ params }) {
 
           {!success ? (
             <>
+              <p className="text-green-light mb-3 text-sm font-medium tracking-widest uppercase">
+                Account Recovery
+              </p>
               <h1 className="text-white-soft mb-3 text-3xl font-semibold">
                 Reset Password
               </h1>

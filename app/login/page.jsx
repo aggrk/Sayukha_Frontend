@@ -4,7 +4,6 @@ import { AuthenticationContext } from "../../context/AuthContext";
 import { useRouter } from "next/navigation";
 import { useContext, useState } from "react";
 import { useForm } from "react-hook-form";
-import Image from "next/image";
 import { Loader2, Eye, EyeOff } from "lucide-react";
 
 export default function LoginPage() {
@@ -32,8 +31,6 @@ export default function LoginPage() {
 
   return (
     <div className="bg-dark text-white-soft flex min-h-screen">
-      <Sidebar />
-
       <div className="flex flex-1 items-center justify-center px-8">
         <div className="w-full max-w-md">
           <p className="text-green-light mb-3 text-sm font-medium tracking-widest uppercase">
@@ -134,44 +131,6 @@ export default function LoginPage() {
             Authorised personnel only.
           </p>
         </div>
-      </div>
-    </div>
-  );
-}
-
-function Sidebar() {
-  return (
-    <div className="bg-dark hidden w-2/5 flex-col justify-center border-r border-white/5 px-20 lg:flex">
-      <div className="mb-20 flex items-center gap-4">
-        <div className="flex h-16 w-16 items-center justify-center">
-          <Image
-            src="/logo.png"
-            width={64}
-            height={64}
-            alt="logo"
-            className="h-full w-full object-contain drop-shadow-md"
-          />
-        </div>
-        <div>
-          <p className="text-white-soft text-lg font-semibold tracking-wide">
-            SAYUKHA
-          </p>
-          <p className="text-gray-soft text-xs tracking-widest uppercase opacity-60">
-            Construction Ltd
-          </p>
-        </div>
-      </div>
-
-      <div className="max-w-md">
-        <h2 className="mb-6 text-4xl leading-tight font-semibold">
-          Sayukha Management System
-          <br />
-          <span className="text-green-light">Staff Portal</span>
-        </h2>
-        <p className="text-gray-soft text-base leading-relaxed opacity-80">
-          Secure internal system for overseeing infrastructure projects,
-          financial operations and reporting.
-        </p>
       </div>
     </div>
   );

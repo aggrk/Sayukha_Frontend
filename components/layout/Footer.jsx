@@ -124,8 +124,7 @@ export function Footer() {
                 {
                   icon: <Mail className="h-5 w-5" />,
                   label: "Email",
-                  content:
-                    "info@sayukhaconstruction.co.tz\nprojects@sayukhaconstruction.co.tz",
+                  content: "info@sayukhaconstruction.co.tz",
                 },
               ].map((item) => (
                 <div
@@ -153,7 +152,7 @@ export function Footer() {
             © {new Date().getFullYear()} Sayukha Construction Ltd. All rights
             reserved. | Registered in Tanzania | BRELA No. 157957341
           </p>
-          <div className="flex justify-center gap-2 sm:justify-start sm:gap-3">
+          {/* <div className="flex justify-center gap-2 sm:justify-start sm:gap-3">
             {[
               { Icon: Linkedin, label: "LinkedIn" },
               { Icon: Twitter, label: "Twitter" },
@@ -168,7 +167,7 @@ export function Footer() {
                 <Icon size={16} />
               </a>
             ))}
-          </div>
+          </div> */}
         </div>
       </div>
     </footer>

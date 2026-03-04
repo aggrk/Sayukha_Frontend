@@ -5,9 +5,9 @@ import Image from "next/image";
 import { FadeUp } from "../ui/FadeUp";
 
 const heroStats = [
-  { value: "100+", label: "Projects Delivered" },
+  { value: "50+", label: "Projects Delivered" },
   { value: "4+", label: "Years of Trust" },
-  { value: "12", label: "Regions Served" },
+  { value: "8", label: "Regions Served" },
 ];
 
 export function Hero() {
@@ -98,13 +98,13 @@ export function Hero() {
 
       {/* Right: Visual */}
       <div className="relative hidden overflow-hidden lg:block">
-        <div
+        {/* <div
           className="absolute inset-0"
           style={{
             background:
               "linear-gradient(to right, #0F0F0F 0%, transparent 30%), linear-gradient(135deg, #1a2a1a 0%, #0a1a0a 50%, #1a0a0a 100%)",
           }}
-        />
+        /> */}
         <div className="absolute inset-0 flex items-center justify-center">
           <Image
             src="/images/hero-bg.jpg"
