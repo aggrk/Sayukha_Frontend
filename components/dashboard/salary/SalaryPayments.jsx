@@ -32,7 +32,6 @@ export default function SalaryPayments() {
   const [openDropdown, setOpenDropdown] = useState(null);
   const [modal, setModal] = useState(null);
   const { user } = useAuth();
-
   const {
     data: salaryData,
     isLoading,
@@ -240,7 +239,15 @@ export default function SalaryPayments() {
                             onToggle={() => handleToggle(salary.id)}
                             onClose={() => setOpenDropdown(null)}
                             onSelectAction={(type) =>
-                              setModal({ employee: salary, type })
+                              setModal({
+                                employee: {
+                                  id: salary.employee_id,
+                                  name: salary.employee_name,
+                                  basic_salary: salary.basic_salary,
+                                  account_number: salary.account_number,
+                                },
+                                type,
+                              })
                             }
                           />
                         )}

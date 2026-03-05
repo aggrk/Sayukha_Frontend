@@ -4,12 +4,14 @@ import { useForm } from "react-hook-form";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   Briefcase,
+  ChevronDown,
   CreditCard,
   DollarSign,
   Loader2,
   Mail,
   Phone,
   Plus,
+  ShieldCheck,
   User,
   X,
 } from "lucide-react";
@@ -153,32 +155,69 @@ export default function AddUserModal({ onClose, onSuccess }) {
               </div>
             </div>
 
-            {/* Phone */}
-            <div className="flex flex-col gap-1.5">
-              <label className="flex items-center gap-1.5 text-[11px] font-bold tracking-widest text-gray-400 uppercase">
-                <Phone size={12} /> Phone Number{" "}
-                <span className="text-red-400">*</span>
-              </label>
-              <div className="relative">
-                <span className="absolute top-1/2 left-3.5 -translate-y-1/2 text-gray-400">
-                  <Phone size={14} />
-                </span>
-                <input
-                  {...register("phone", { required: "Phone is required" })}
-                  type="tel"
-                  placeholder="e.g. +255 712 345 678"
-                  className={`text-dark font-body w-full rounded-xl border py-2.5 pr-4 pl-10 text-sm outline-none ${
-                    errors.phone
-                      ? "border-[#fca5a5] bg-[#fff7f7]"
-                      : "border-[#e5e7eb] bg-white"
-                  }`}
-                />
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              {/* Phone */}
+              <div className="flex flex-col gap-1.5">
+                <label className="flex items-center gap-1.5 text-[11px] font-bold tracking-widest text-gray-400 uppercase">
+                  <Phone size={12} /> Phone Number{" "}
+                  <span className="text-red-400">*</span>
+                </label>
+                <div className="relative">
+                  <span className="absolute top-1/2 left-3.5 -translate-y-1/2 text-gray-400">
+                    <Phone size={14} />
+                  </span>
+                  <input
+                    {...register("phone", { required: "Phone is required" })}
+                    type="tel"
+                    placeholder="e.g. +255 712 345 678"
+                    className={`text-dark font-body w-full rounded-xl border py-2.5 pr-4 pl-10 text-sm outline-none ${
+                      errors.phone
+                        ? "border-[#fca5a5] bg-[#fff7f7]"
+                        : "border-[#e5e7eb] bg-white"
+                    }`}
+                  />
+                </div>
+                {errors.phone && (
+                  <p className="text-[11px] font-medium text-red-400">
+                    {errors.phone.message}
+                  </p>
+                )}
               </div>
-              {errors.phone && (
-                <p className="text-[11px] font-medium text-red-400">
-                  {errors.phone.message}
-                </p>
-              )}
+
+              {/* Role */}
+              <div className="flex flex-col gap-1.5">
+                <label className="flex items-center gap-1.5 text-[11px] font-bold tracking-widest text-gray-400 uppercase">
+                  <ShieldCheck size={12} /> Role{" "}
+                  <span className="text-red-400">*</span>
+                </label>
+                <div className="relative">
+                  <span className="absolute top-1/2 left-3.5 -translate-y-1/2 text-gray-400">
+                    <ShieldCheck size={14} />
+                  </span>
+                  <select
+                    {...register("role", { required: "Role is required" })}
+                    className={`font-heading text-dark w-full appearance-none rounded-xl border py-2.5 pr-8 pl-10 text-sm outline-none ${
+                      errors.role
+                        ? "border-[#fca5a5] bg-[#fff7f7]"
+                        : "border-[#e5e7eb] bg-white"
+                    }`}
+                  >
+                    <option value="">Select role...</option>
+                    <option value="admin">Admin</option>
+                    <option value="site manager">Site Manager</option>
+                    <option value="site admin">Site Admin</option>
+                    <option value="user">User</option>
+                  </select>
+                  <span className="pointer-events-none absolute top-1/2 right-3.5 -translate-y-1/2 text-gray-400">
+                    <ChevronDown size={14} />
+                  </span>
+                </div>
+                {errors.role && (
+                  <p className="text-[11px] font-medium text-red-400">
+                    {errors.role.message}
+                  </p>
+                )}
+              </div>
             </div>
 
             {/* ── Job Info ───────────────────────────────────────────── */}
