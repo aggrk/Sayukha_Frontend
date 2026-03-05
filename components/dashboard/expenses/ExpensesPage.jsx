@@ -8,12 +8,14 @@ import Pagination from "../../ui/Pagination";
 import { LIMIT } from "../../../lib/utils";
 import ExpenseModal from "./ExpenseModal";
 import DeleteModal from "./DeleteModal";
+import { useAuth } from "../../../hooks/useAuth";
 
 export default function ExpensesPage() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [editExpense, setEditExpense] = useState(null);
   const [deleteExpense, setDeleteExpense] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const { user } = useAuth();
 
   const {
     data: expenses,
@@ -206,24 +208,26 @@ export default function ExpensesPage() {
                     </td>
 
                     {/* Actions */}
-                    <td className="px-5 py-3.5 align-middle">
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={() => setEditExpense(expense)}
-                          className="bg-green-light/10 hover:bg-green-light/20 text-green-light flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg transition-colors"
-                          title="Edit expense"
-                        >
-                          <Pencil size={14} />
-                        </button>
-                        <button
-                          onClick={() => setDeleteExpense(expense)}
-                          className="text-red flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg bg-red-50 transition-colors hover:bg-red-100"
-                          title="Delete expense"
-                        >
-                          <Trash2 size={14} />
-                        </button>
-                      </div>
-                    </td>
+                    {user?.data?.id === expense.paid_by && (
+                      <td className="px-5 py-3.5 align-middle">
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => setEditExpense(expense)}
+                            className="bg-green-light/10 hover:bg-green-light/20 text-green-light flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg transition-colors"
+                            title="Edit expense"
+                          >
+                            <Pencil size={14} />
+                          </button>
+                          <button
+                            onClick={() => setDeleteExpense(expense)}
+                            className="text-red flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg bg-red-50 transition-colors hover:bg-red-100"
+                            title="Delete expense"
+                          >
+                            <Trash2 size={14} />
+                          </button>
+                        </div>
+                      </td>
+                    )}
                   </tr>
                 ))}
               </tbody>

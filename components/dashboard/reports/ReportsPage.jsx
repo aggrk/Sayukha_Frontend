@@ -175,7 +175,7 @@ export default function ReportPage() {
                     <FileText size={13} />
                     Export Word
                   </button>
-                  {user?.data?.role !== "admin" && (
+                  {user?.data?.id === report.prepared_by && (
                     <>
                       <button
                         onClick={() => setEditReport(report)}
