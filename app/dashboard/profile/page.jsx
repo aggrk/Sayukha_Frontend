@@ -18,9 +18,11 @@ import {
   CheckCircle2,
   AlertCircle,
   Loader2,
+  ArrowLeft,
 } from "lucide-react";
 import LoadingSpinner from "../../../components/ui/LoadingSpinner";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
+import Link from "next/link";
 
 // ─── Field Display Component ────────────────────────────────────────────────
 function InfoField({ icon: Icon, label, value, accent = false }) {
@@ -105,13 +107,22 @@ export default function ProfilePage() {
 
   return (
     <div className="bg-white-soft flex min-h-screen flex-col items-center px-4 py-10 sm:px-6 lg:px-10">
-      <div className="mb-8 w-full max-w-5xl">
-        <h1 className="font-heading text-2xl font-bold tracking-tight text-black sm:text-3xl">
-          My Profile
-        </h1>
-        <p className="font-body text-dark/50 mt-1 text-sm">
-          View and manage your personal information
-        </p>
+      <div className="mb-8 flex w-full max-w-5xl items-start justify-between">
+        <div>
+          <h1 className="font-heading text-2xl font-bold tracking-tight text-black sm:text-3xl">
+            My Profile
+          </h1>
+          <p className="font-body text-dark/50 mt-1 text-sm">
+            View and manage your personal information
+          </p>
+        </div>
+        <Link
+          href="/dashboard"
+          className="text-dark hover:text-green-light inline-flex items-center gap-2 text-xs tracking-widest uppercase transition-colors duration-200"
+        >
+          <ArrowLeft size={13} />
+          Back to Dashboard
+        </Link>
       </div>
 
       <div className="border-gray-soft/50 w-full max-w-5xl overflow-hidden rounded-2xl border bg-white shadow-sm">
