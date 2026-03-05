@@ -175,20 +175,24 @@ export default function ReportPage() {
                     <FileText size={13} />
                     Export Word
                   </button>
-                  <button
-                    onClick={() => setEditReport(report)}
-                    className="bg-green/10 hover:bg-green/20 text-green flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg transition-colors"
-                    title="Edit report"
-                  >
-                    <Pencil size={14} />
-                  </button>
-                  <button
-                    onClick={() => setDeleteReport(report)}
-                    className="text-red flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg bg-red-50 transition-colors hover:bg-red-100"
-                    title="Delete report"
-                  >
-                    <Trash2 size={14} />
-                  </button>
+                  {user?.data?.role !== "admin" && (
+                    <>
+                      <button
+                        onClick={() => setEditReport(report)}
+                        className="bg-green/10 hover:bg-green/20 text-green flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg transition-colors"
+                        title="Edit report"
+                      >
+                        <Pencil size={14} />
+                      </button>
+                      <button
+                        onClick={() => setDeleteReport(report)}
+                        className="text-red flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg bg-red-50 transition-colors hover:bg-red-100"
+                        title="Delete report"
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    </>
+                  )}
                 </div>
               </div>
             ))}
