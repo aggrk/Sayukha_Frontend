@@ -19,7 +19,7 @@ export default function ResetPasswordPage({ params }) {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
 
-  const token = use(params);
+  const { token } = use(params);
 
   const {
     register,

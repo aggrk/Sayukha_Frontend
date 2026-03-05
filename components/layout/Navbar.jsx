@@ -2,6 +2,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useState, useEffect } from "react";
+import { useAuth } from "../../hooks/useAuth";
 
 const navLinks = [
   { label: "Services", href: "#services" },
@@ -12,6 +13,7 @@ const navLinks = [
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const { user } = useAuth();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -80,10 +82,10 @@ export function Navbar() {
           </li>
           <li>
             <Link
-              href="login"
+              href={`${user?.data ? "dashboard" : "login"}`}
               className="font-heading bg-red clip-notch-sm hover:bg-red-dark px-6 py-2.5 text-sm font-bold tracking-[0.12em] text-white uppercase no-underline transition-colors"
             >
-              Sign In
+              {user?.data ? "Go to Dashboard" : "Sign In"}
             </Link>
           </li>
         </ul>

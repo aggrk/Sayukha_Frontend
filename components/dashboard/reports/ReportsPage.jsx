@@ -25,7 +25,7 @@ export default function ReportPage() {
   const { user } = useAuth();
 
   const endPoint =
-    user?.data?.role === "admin" ? "/reports" : "/reports/myReports";
+    user?.data?.role === "admin" ? "/reports" : "/reports/my-reports";
 
   const {
     data: reportsData,
