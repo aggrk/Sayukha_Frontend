@@ -15,7 +15,8 @@ export default function ActionDropdown({
   const { data: employeesData, isLoading } = useFetch(["employees"], "/users");
   const elligibleEmployees = employeesData?.data?.filter(
     (employee) =>
-      employee.role === "site manager" || employee.role === "site admin",
+      (employee.role === "site manager" || employee.role === "site admin") &&
+      employee.status === "active",
   );
 
   useEffect(() => {

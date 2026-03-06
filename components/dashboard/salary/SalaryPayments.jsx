@@ -2,11 +2,12 @@
 
 import { useCallback, useState } from "react";
 import useFetch from "../../../hooks/useFetch";
-import { Banknote } from "lucide-react";
+import { Banknote, ChevronDown } from "lucide-react";
 import { LIMIT, formatCurrency, formatDate } from "../../../lib/utils";
 import Pagination from "../../ui/Pagination";
 import ActionDropdown from "../employees/ActionDropdown";
 import SalaryModal from "../employees/SalaryModal";
+import MonthPicker from "../../ui/MonthPicker";
 import { useAuth } from "../../../hooks/useAuth";
 
 function StatusBadge({ status }) {
@@ -31,15 +32,22 @@ export default function SalaryPayments() {
   const [currentPage, setCurrentPage] = useState(1);
   const [openDropdown, setOpenDropdown] = useState(null);
   const [modal, setModal] = useState(null);
+  const [selectedMonth, setSelectedMonth] = useState("");
+  const [selectedStatus, setSelectedStatus] = useState("");
   const { user } = useAuth();
+
+  const queryParams = {
+    page: currentPage,
+    limit: LIMIT,
+    ...(selectedMonth && { payment_month: selectedMonth }),
+    ...(selectedStatus && { status: selectedStatus }),
+  };
+
   const {
     data: salaryData,
     isLoading,
     isError,
-  } = useFetch("salary-payments", "/salary-payments", {
-    page: currentPage,
-    limit: LIMIT,
-  });
+  } = useFetch("salary-payments", "/salary-payments", queryParams);
 
   const salaries = salaryData?.data ?? [];
   const totalCount = salaryData?.result ?? 0;
@@ -50,13 +58,30 @@ export default function SalaryPayments() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
+  const handleMonthChange = (val) => {
+    setSelectedMonth(val);
+    setCurrentPage(1);
+  };
+
+  const handleStatusChange = (e) => {
+    setSelectedStatus(e.target.value);
+    setCurrentPage(1);
+  };
+
+  const handleClearFilters = () => {
+    setSelectedMonth("");
+    setSelectedStatus("");
+    setCurrentPage(1);
+  };
+
+  const hasActiveFilters = selectedMonth || selectedStatus;
+
   const handleToggle = useCallback((id) => {
     setOpenDropdown((prev) => (prev === id ? null : id));
   }, []);
 
   return (
     <>
-      {/* SalaryModal — same pattern as EmployeeTable */}
       {modal && (
         <SalaryModal
           employee={modal.employee}
@@ -68,7 +93,7 @@ export default function SalaryPayments() {
       <div className="font-body min-h-screen py-8">
         <div className="mx-auto">
           {/* Header */}
-          <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
+          <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
             <div>
               <h1 className="font-heading text-3xl leading-tight font-bold text-black">
                 Salary Payments
@@ -77,6 +102,62 @@ export default function SalaryPayments() {
                 Track and manage all employee salary disbursements
               </p>
             </div>
+          </div>
+
+          {/* Filter Bar */}
+          <div className="bg-gray-light-soft mb-4 flex flex-wrap items-end gap-4 rounded-2xl border border-green-200 px-5 py-4">
+            {/* Month Picker */}
+            <div className="flex flex-col gap-1.5">
+              <label className="text-dark flex items-center gap-1 text-[10px] font-bold tracking-widest uppercase">
+                Payment Month
+              </label>
+              <MonthPicker value={selectedMonth} onChange={handleMonthChange} />
+            </div>
+
+            {/* Status */}
+            <div className="flex flex-col gap-1.5">
+              <label className="text-dark flex items-center gap-1 text-[10px] font-bold tracking-widest uppercase">
+                Status
+              </label>
+              <div className="relative">
+                <select
+                  value={selectedStatus}
+                  onChange={handleStatusChange}
+                  className="font-body h-9.5 w-44 cursor-pointer appearance-none rounded-xl border border-green-200 bg-white py-2 pr-8 pl-3 text-sm text-gray-600 transition-all outline-none focus:border-green-400 focus:ring-2 focus:ring-green-100"
+                >
+                  <option value="">All Statuses</option>
+                  <option value="paid">Paid</option>
+                  <option value="partial">Partial</option>
+                  <option value="pending">Pending</option>
+                </select>
+                <ChevronDown
+                  size={13}
+                  className="pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 text-gray-400"
+                />
+              </div>
+            </div>
+
+            {/* Active pills + clear */}
+            {hasActiveFilters && (
+              <div className="ml-auto flex items-center gap-2 self-end pb-0.5">
+                {selectedMonth && (
+                  <span className="flex items-center gap-1.5 rounded-full border border-green-200 bg-white px-3 py-1 text-[11px] font-semibold text-green-700">
+                    {selectedMonth}
+                  </span>
+                )}
+                {selectedStatus && (
+                  <span className="flex items-center gap-1.5 rounded-full border border-green-200 bg-white px-3 py-1 text-[11px] font-semibold text-green-700 capitalize">
+                    {selectedStatus}
+                  </span>
+                )}
+                <button
+                  onClick={handleClearFilters}
+                  className="cursor pointer rounded-full border border-red-200 bg-white px-3 py-1 text-[11px] font-semibold text-red-400 transition-colors hover:bg-red-50"
+                >
+                  Clear filters
+                </button>
+              </div>
+            )}
           </div>
 
           {/* Loading */}
@@ -102,7 +183,11 @@ export default function SalaryPayments() {
               <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-green-50">
                 <Banknote size={22} className="text-green" />
               </div>
-              <p className="text-sm text-gray-400">No salary payments found.</p>
+              <p className="text-sm text-gray-400">
+                {hasActiveFilters
+                  ? "No payments match your filters."
+                  : "No salary payments found."}
+              </p>
             </div>
           )}
 
@@ -142,7 +227,6 @@ export default function SalaryPayments() {
                         index % 2 === 0 ? "bg-white" : "bg-white-soft"
                       }`}
                     >
-                      {/* Employee */}
                       <td className="px-5 py-4 align-middle">
                         <p className="leading-snug font-semibold text-black">
                           {salary.employee_name || "—"}
@@ -151,29 +235,21 @@ export default function SalaryPayments() {
                           ID #{salary.employee_id ?? "N/A"}
                         </span>
                       </td>
-
-                      {/* Payment Month */}
                       <td className="px-5 py-4 align-middle text-gray-600">
                         {formatDate(salary.payment_month)}
                       </td>
-
-                      {/* Basic Salary */}
                       <td className="px-5 py-4 align-middle font-bold whitespace-nowrap text-black tabular-nums">
                         {formatCurrency(salary.basic_salary)}
                         <span className="ml-1 text-[10px] font-normal text-gray-400">
                           TSH
                         </span>
                       </td>
-
-                      {/* Advance Amount */}
                       <td className="px-5 py-4 align-middle font-bold whitespace-nowrap text-black tabular-nums">
                         {formatCurrency(salary.advance_amount)}
                         <span className="ml-1 text-[10px] font-normal text-gray-400">
                           TSH
                         </span>
                       </td>
-
-                      {/* Advance Paid At */}
                       <td className="px-5 py-4 align-middle text-xs text-gray-500">
                         {salary.advance_paid_at ? (
                           formatDate(salary.advance_paid_at)
@@ -181,16 +257,12 @@ export default function SalaryPayments() {
                           <span className="text-gray-300">—</span>
                         )}
                       </td>
-
-                      {/* Full Payment Amount */}
                       <td className="px-5 py-4 align-middle font-bold whitespace-nowrap text-black tabular-nums">
                         {formatCurrency(salary.full_payment_amount)}
                         <span className="ml-1 text-[10px] font-normal text-gray-400">
                           TSH
                         </span>
                       </td>
-
-                      {/* Full Payment Paid At */}
                       <td className="px-5 py-4 align-middle text-xs text-gray-500">
                         {salary.full_payment_paid_at ? (
                           formatDate(salary.full_payment_paid_at)
@@ -198,8 +270,6 @@ export default function SalaryPayments() {
                           <span className="text-gray-300">—</span>
                         )}
                       </td>
-
-                      {/* Balance */}
                       <td className="px-5 py-4 align-middle font-bold whitespace-nowrap tabular-nums">
                         <span
                           className={
@@ -214,18 +284,12 @@ export default function SalaryPayments() {
                           TSH
                         </span>
                       </td>
-
-                      {/* Status */}
                       <td className="px-5 py-4 align-middle">
                         <StatusBadge status={salary.status} />
                       </td>
-
-                      {/* Notes */}
                       <td className="max-w-40 truncate px-5 py-4 align-middle text-xs text-gray-400">
                         {salary.notes || "—"}
                       </td>
-
-                      {/* Actions */}
                       <td className="px-5 py-4 align-middle">
                         {user?.data?.role === "admin" && (
                           <ActionDropdown

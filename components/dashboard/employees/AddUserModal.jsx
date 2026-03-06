@@ -33,13 +33,18 @@ export default function AddUserModal({ onClose, onSuccess }) {
       position: "",
       account_number: "",
       basic_salary: "",
+      role: "",
     },
   });
 
   const [serverError, setServerError] = useState("");
 
   const { mutate, isPending, isSuccess } = useMutation({
-    mutationFn: (data) => api.post("/users/signup", data),
+    mutationFn: (data) => {
+      console.log(data);
+      api.post("/users/signup", data);
+    },
+
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["employees"] });
       setTimeout(() => {
