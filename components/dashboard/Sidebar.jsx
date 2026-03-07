@@ -9,6 +9,7 @@ import {
   X,
   BrickWall,
   DollarSign,
+  Component,
 } from "lucide-react";
 
 const navLinksAdmin = [
@@ -17,6 +18,7 @@ const navLinksAdmin = [
   { label: "Expenses", icon: <Receipt size={18} /> },
   { label: "Projects", icon: <BrickWall size={18} /> },
   { label: "Salary Payments", icon: <DollarSign size={18} /> },
+  { label: "Expense Categories", icon: <Component size={18} /> },
 ];
 
 const navLinksUser = [

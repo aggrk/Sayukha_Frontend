@@ -94,7 +94,7 @@ export default function Header({ activeNav, setSidebarOpen }) {
         </h1>
 
         {/* Search */}
-        <div className="hidden max-w-md flex-1 sm:block lg:ml-8">
+        {/* <div className="hidden max-w-md flex-1 sm:block lg:ml-8">
           <div
             className="relative flex items-center rounded-xl border transition-all duration-200"
             style={{
@@ -114,7 +114,7 @@ export default function Header({ activeNav, setSidebarOpen }) {
               onBlur={() => setSearchFocused(false)}
             />
           </div>
-        </div>
+        </div> */}
 
         {/* Right section */}
         <div className="ml-auto flex items-center gap-2">

@@ -12,6 +12,7 @@ import ProjectsPage from "../../components/dashboard/projects/ProjectsPage";
 import User from "../../components/dashboard/user/User";
 import { useAuth } from "../../hooks/useAuth";
 import SalaryPayments from "../../components/dashboard/salary/SalaryPayments";
+import CategoriesPage from "../../components/dashboard/categories/CategoriesPage";
 
 export default function DashboardPage() {
   const [activeNav, setActiveNav] = useState("Dashboard");
@@ -30,6 +31,8 @@ export default function DashboardPage() {
         return <ProjectsPage />;
       case "Salary Payments":
         return <SalaryPayments />;
+      case "Expense Categories":
+        return <CategoriesPage />;
       default:
         return <DashboardContent />;
     }
