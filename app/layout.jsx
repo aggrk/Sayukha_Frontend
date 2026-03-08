@@ -36,7 +36,7 @@ export const metadata = {
   ],
   metadataBase: new URL("https://sayukhaconstruction.co.tz"),
   alternates: {
-    canonical: "/",
+    canonical: "https://sayukhaconstruction.co.tz",
   },
   openGraph: {
     title: "Sayukha Construction | Tanzania Civil Engineering & Infrastructure",
