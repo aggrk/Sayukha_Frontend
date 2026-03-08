@@ -176,16 +176,6 @@ export default function ResetPasswordPage({ params }) {
               <p className="text-gray-soft mt-8 text-center text-sm opacity-50">
                 Authorised personnel only.
               </p>
-
-              <p className="text-gray-soft/40 mt-4 text-center text-sm">
-                Link expired or invalid?{" "}
-                <Link
-                  href="/resend-token"
-                  className="text-green-light hover:text-green underline underline-offset-4 transition-colors duration-200"
-                >
-                  Request a new one
-                </Link>
-              </p>
             </>
           ) : (
             /* ── Success State ── */

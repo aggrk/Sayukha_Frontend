@@ -87,8 +87,8 @@ export default function ProfilePage() {
 
   const { mutate, isPending, isSuccess, isError, error } = useMutation({
     mutationFn: (data) => api.patch("/users/update-me", data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["employees"] });
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["employees"] });
       setIsEditing(false);
     },
   });

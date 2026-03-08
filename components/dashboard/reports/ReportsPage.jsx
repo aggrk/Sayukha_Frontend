@@ -17,6 +17,7 @@ import EditModal from "./EditModal";
 import MetaItem from "../../ui/MetaItems";
 import DeleteModal from "./DeleteModal";
 import { useAuth } from "../../../hooks/useAuth";
+import toast from "react-hot-toast";
 
 export default function ReportPage() {
   const [editReport, setEditReport] = useState(null);
@@ -64,7 +65,7 @@ export default function ReportPage() {
       link.remove();
       window.URL.revokeObjectURL(url);
     } catch (error) {
-      console.error("Failed to export report:", error);
+      toast.error("Failed to export report");
     }
   };
 

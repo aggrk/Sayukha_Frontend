@@ -2,6 +2,7 @@
 import axios, { AxiosError } from "axios";
 import { createContext, useEffect, useState, ReactNode } from "react";
 import { apiUrl } from "../lib/utils";
+import toast from "react-hot-toast";
 
 export const AuthenticationContext = createContext(undefined);
 
@@ -18,7 +19,6 @@ export default function AuthContextProvider({ children }) {
       });
       setUser(res.data);
     } catch (err) {
-      console.log(err.response?.data?.message);
       setUser(null);
     } finally {
       setIsLoading(false);
@@ -39,7 +39,6 @@ export default function AuthContextProvider({ children }) {
       });
       setUser(userResponse.data);
     } catch (err) {
-      console.log(err.response?.data?.message || "Login failed");
       throw new Error(err.response?.data?.message || "Login failed");
     } finally {
       setIsLoading(false);
@@ -52,9 +51,9 @@ export default function AuthContextProvider({ children }) {
       await axios.get(`${apiUrl}/users/logout`, { withCredentials: true });
       setUser(null);
     } catch (err) {
-      console.log(
-        err.response?.data?.message || "An unexpected error occurred",
-      );
+      const error =
+        err.response?.data?.message || "An unexpected error occurred";
+      toast.error(error);
     } finally {
       setIsLoading(false);
     }

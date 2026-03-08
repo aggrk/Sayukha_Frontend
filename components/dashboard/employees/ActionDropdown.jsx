@@ -12,8 +12,6 @@ export default function ActionDropdown({
 }) {
   const ref = useRef();
 
-  console.log(employee);
-
   useEffect(() => {
     if (!isOpen) return;
     function handleOutside(e) {

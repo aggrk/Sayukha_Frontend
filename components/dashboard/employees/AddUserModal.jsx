@@ -41,7 +41,6 @@ export default function AddUserModal({ onClose, onSuccess }) {
 
   const { mutate, isPending, isSuccess } = useMutation({
     mutationFn: (data) => {
-      console.log(data);
       api.post("/users/signup", data);
     },
 

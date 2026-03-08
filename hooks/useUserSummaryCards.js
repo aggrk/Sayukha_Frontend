@@ -7,7 +7,6 @@ import useFetch from "./useFetch";
 export default function useUserSummaryCards() {
   const { user } = useAuth();
   const userId = user?.data?.id;
-  console.log(user);
 
   const { data: userReports } = useFetch(
     "user-reports",

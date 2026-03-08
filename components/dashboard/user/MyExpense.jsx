@@ -5,6 +5,7 @@ import { LIMIT } from "../../../lib/utils";
 import { Download, Plus } from "lucide-react";
 import ExpenseModal from "../expenses/ExpenseModal";
 import api from "../../../lib/api";
+import toast from "react-hot-toast";
 
 export default function MyExpense() {
   const [currentPage, setCurrentPage] = useState(1);
@@ -42,7 +43,7 @@ export default function MyExpense() {
       link.remove();
       window.URL.revokeObjectURL(url);
     } catch (error) {
-      console.error("Failed to export expenses:", error);
+      toast.error("Failed to export expenses");
     }
   };
 

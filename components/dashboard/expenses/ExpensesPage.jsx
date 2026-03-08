@@ -9,6 +9,7 @@ import { LIMIT } from "../../../lib/utils";
 import ExpenseModal from "./ExpenseModal";
 import DeleteModal from "./DeleteModal";
 import { useAuth } from "../../../hooks/useAuth";
+import toast from "react-hot-toast";
 
 export default function ExpensesPage() {
   const [showAddModal, setShowAddModal] = useState(false);
@@ -49,7 +50,7 @@ export default function ExpensesPage() {
       link.remove();
       window.URL.revokeObjectURL(url);
     } catch (error) {
-      console.error("Failed to export expenses:", error);
+      toast.error("Failed to export expenses");
     }
   };
 

@@ -7,8 +7,10 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import api from "../../../../lib/api";
 import { useAuth } from "../../../../hooks/useAuth";
+import { useQueryClient } from "@tanstack/react-query";
 
 export default function ChangePasswordCard() {
+  const queryClient = useQueryClient();
   const [successMsg, setSuccessMsg] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
   const { logout } = useAuth();
@@ -31,6 +33,8 @@ export default function ChangePasswordCard() {
         current_password: data.current_password,
         new_password: data.new_password,
       });
+      await queryClient.invalidateQueries({ queryKey: ["employees"] });
+
       setSuccessMsg(
         "Password updated successfully. Please log in again if prompted.",
       );
