@@ -21,18 +21,27 @@ const inter = Inter({
 export const metadata = {
   title: "Sayukha Construction | Tanzania Civil Engineering & Infrastructure",
   description:
-    "Tanzania's leading civil engineering company. Road construction, building works, infrastructure development, and large-scale project management across all regions.",
+    "Tanzania's leading civil engineering company specializing in road construction, building works, infrastructure development, and large-scale project management across all regions of Tanzania.",
   keywords: [
     "civil engineering Tanzania",
     "construction company Tanzania",
     "road construction Tanzania",
-    "infrastructure Tanzania",
+    "infrastructure development Tanzania",
     "building contractor Tanzania",
+    "civil works Tanzania",
+    "Sayukha Construction",
+    "Tanzania contractor",
+    "bridge construction Tanzania",
+    "commercial construction Tanzania",
   ],
+  metadataBase: new URL("https://sayukhaconstruction.co.tz"),
+  alternates: {
+    canonical: "/",
+  },
   openGraph: {
-    title: "Sayukha Construction | Tanzania Civil Engineering",
+    title: "Sayukha Construction | Tanzania Civil Engineering & Infrastructure",
     description:
-      "Building Tanzania's infrastructure with precision and reliability.",
+      "Tanzania's fastest-growing civil engineering company specializing in road construction, building works, and infrastructure development across all regions.",
     url: "https://sayukhaconstruction.co.tz",
     siteName: "Sayukha Construction",
     locale: "en_TZ",
@@ -46,7 +55,7 @@ export default function RootLayout({ children }) {
       lang="en"
       className={`${poppins.variable} ${inter.variable} font-inter`}
     >
-      <body className="bg-black text-white-soft overflow-x-hidden font-body antialiased">
+      <body className="text-white-soft font-body overflow-x-hidden bg-black antialiased">
         <QueryProvider>
           <AuthContextProvider>{children}</AuthContextProvider>
           <Toaster
