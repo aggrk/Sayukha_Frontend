@@ -67,7 +67,6 @@ export default function ProjectModal({ project = null, onClose }) {
         const res = await api.patch(`/projects/${project.id}`, formData, {
           headers: { "Content-Type": "multipart/form-data" },
         });
-        console.log("Update response:", res);
         if (res?.data?.status === "success")
           toast.success("Project updated successfully!");
       } else {
