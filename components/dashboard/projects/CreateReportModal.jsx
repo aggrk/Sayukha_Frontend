@@ -4,12 +4,22 @@ import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import api from "../../../lib/api";
-import { FileText, Loader2, X } from "lucide-react";
+import { FileText, Loader2, Paperclip, X } from "lucide-react";
+
+const ACCEPTED_TYPES = [
+  "application/pdf",
+  "application/msword",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  "application/vnd.ms-excel",
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+];
+const MAX_SIZE_MB = 10;
 
 export default function CreateReportModal({ project, onClose }) {
   const queryClient = useQueryClient();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [selectedFileName, setSelectedFileName] = useState(null);
 
   const {
     register,
@@ -18,7 +28,7 @@ export default function CreateReportModal({ project, onClose }) {
   } = useForm({
     defaultValues: {
       report_date: "",
-      report_summary: "",
+      notes: "",
     },
   });
 
@@ -26,10 +36,14 @@ export default function CreateReportModal({ project, onClose }) {
     setError("");
     setLoading(true);
     try {
-      await api.post("/reports", {
-        project_id: project.id,
-        report_date: data.report_date,
-        report_summary: data.report_summary,
+      const formData = new FormData();
+      formData.append("project_id", project.id);
+      formData.append("report_date", data.report_date);
+      if (data.notes?.trim()) formData.append("notes", data.notes.trim());
+      formData.append("file", data.file[0]);
+
+      await api.post("/reports", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
       });
       await queryClient.invalidateQueries({ queryKey: ["reports"] });
       onClose();
@@ -92,28 +106,73 @@ export default function CreateReportModal({ project, onClose }) {
               )}
             </div>
 
-            {/* Report Summary */}
+            {/* File Upload */}
             <div className="flex flex-col gap-1.5">
               <label className="text-[11px] font-bold tracking-widest text-gray-400 uppercase">
-                Report Summary <span className="text-red-500">*</span>
+                Report File <span className="text-red-500">*</span>
               </label>
-              <textarea
-                rows={4}
-                placeholder="Enter report summary..."
-                {...register("report_summary", {
-                  required: "Report summary is required.",
-                })}
-                className={`text-dark focus:border-green focus:ring-green/10 resize-none rounded-xl border px-4 py-2.5 text-sm transition-colors outline-none focus:ring-2 ${
-                  errors.report_summary
-                    ? "border-red-400 bg-red-50"
-                    : "border-gray-200"
+              <label
+                className={`flex cursor-pointer items-center gap-3 rounded-xl border-2 border-dashed px-4 py-3.5 transition-colors ${
+                  errors.file
+                    ? "border-red-300 bg-red-50"
+                    : "border-gray-200 hover:border-blue-300 hover:bg-blue-50/40"
                 }`}
-              />
-              {errors.report_summary && (
+              >
+                <Paperclip
+                  size={15}
+                  className={`shrink-0 ${errors.file ? "text-red-400" : "text-gray-400"}`}
+                />
+                <span
+                  className={`text-[13px] ${selectedFileName ? "font-medium text-gray-700" : "text-gray-400"}`}
+                >
+                  {selectedFileName ?? "Click to upload PDF, Word, or Excel…"}
+                </span>
+                <input
+                  type="file"
+                  accept=".pdf,.doc,.docx,.xls,.xlsx"
+                  className="hidden"
+                  {...register("file", {
+                    required: "A report file is required.",
+                    validate: {
+                      type: (files) =>
+                        ACCEPTED_TYPES.includes(files?.[0]?.type) ||
+                        "Only PDF, Word, or Excel files are allowed.",
+                      size: (files) =>
+                        files?.[0]?.size <= MAX_SIZE_MB * 1024 * 1024 ||
+                        `File must be under ${MAX_SIZE_MB} MB.`,
+                    },
+                    onChange: (e) => {
+                      const file = e.target.files?.[0];
+                      setSelectedFileName(file ? file.name : null);
+                    },
+                  })}
+                />
+              </label>
+              {errors.file && (
                 <p className="text-[11px] text-red-500">
-                  {errors.report_summary.message}
+                  {errors.file.message}
                 </p>
               )}
+              <p className="text-[11px] text-gray-400">
+                Accepted formats: PDF, DOC, DOCX, XLS, XLSX · Max {MAX_SIZE_MB}{" "}
+                MB
+              </p>
+            </div>
+
+            {/* Notes (optional) */}
+            <div className="flex flex-col gap-1.5">
+              <label className="text-[11px] font-bold tracking-widest text-gray-400 uppercase">
+                Notes{" "}
+                <span className="font-normal text-gray-400 normal-case">
+                  (optional)
+                </span>
+              </label>
+              <textarea
+                rows={3}
+                placeholder="Add any notes about this report..."
+                {...register("notes")}
+                className="text-dark focus:border-green focus:ring-green/10 resize-none rounded-xl border border-gray-200 px-4 py-2.5 text-sm transition-colors outline-none focus:ring-2"
+              />
             </div>
 
             {/* API Error */}

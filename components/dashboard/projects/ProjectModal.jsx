@@ -4,14 +4,21 @@ import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import api from "../../../lib/api";
-import { Loader2, Pencil, Plus, X } from "lucide-react";
+import { ImagePlus, Loader2, Pencil, Plus, X } from "lucide-react";
 import toast from "react-hot-toast";
+import { BASE_URL } from "../../../lib/utils";
+
+const MAX_IMAGE_SIZE_MB = 5;
+const ALLOWED_TYPES = ["image/jpeg", "image/jpg", "image/png", "image/webp"];
 
 export default function ProjectModal({ project = null, onClose }) {
   const queryClient = useQueryClient();
   const isEditing = !!project;
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [previewUrl, setPreviewUrl] = useState(
+    project?.image_path ? `${BASE_URL}/${project.image_path}` : null,
+  );
 
   const {
     register,
@@ -31,19 +38,46 @@ export default function ProjectModal({ project = null, onClose }) {
     },
   });
 
+  const handleImageChange = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setPreviewUrl(URL.createObjectURL(file));
+  };
+
+  const clearImage = () => {
+    setPreviewUrl(null);
+  };
+
   const onSubmit = async (data) => {
     setError("");
     setLoading(true);
     try {
+      const formData = new FormData();
+
+      // Append all text fields
+      Object.entries(data).forEach(([key, value]) => {
+        if (key !== "image" && value !== undefined && value !== "")
+          formData.append(key, value);
+      });
+
+      // Append image only if a new file was selected
+      if (data.image?.[0]) formData.append("image", data.image[0]);
+
       if (isEditing) {
-        const res = await api.patch(`/projects/${project.id}`, data);
+        const res = await api.patch(`/projects/${project.id}`, formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+        console.log("Update response:", res);
         if (res?.data?.status === "success")
-          toast.success("Project Updated Succesfully!");
+          toast.success("Project updated successfully!");
       } else {
-        const res = await api.post("/projects", data);
+        const res = await api.post("/projects", formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
         if (res?.data?.status === "success")
-          toast.success("Project Added Succesfully!");
+          toast.success("Project added successfully!");
       }
+
       await queryClient.invalidateQueries({ queryKey: ["projects"] });
       onClose();
     } catch (err) {
@@ -96,6 +130,101 @@ export default function ProjectModal({ project = null, onClose }) {
           className="flex flex-1 flex-col overflow-hidden"
         >
           <div className="flex flex-1 flex-col gap-4 overflow-y-auto px-6 py-5">
+            {/* Project Image (optional) */}
+            <div className="flex flex-col gap-1.5">
+              <label className="text-[11px] font-bold tracking-widest text-gray-400 uppercase">
+                Project Image{" "}
+                <span className="font-normal text-gray-400 normal-case">
+                  (optional)
+                </span>
+              </label>
+
+              {previewUrl ? (
+                // ── Image preview ──────────────────────────────────────────
+                <div className="relative w-full overflow-hidden rounded-xl border border-gray-200">
+                  <img
+                    src={previewUrl}
+                    alt="Project preview"
+                    className="h-40 w-full object-cover"
+                  />
+                  <button
+                    type="button"
+                    onClick={clearImage}
+                    className="absolute top-2 right-2 flex h-7 w-7 items-center justify-center rounded-full bg-black/50 text-white transition-colors hover:bg-black/70"
+                    title="Remove image"
+                  >
+                    <X size={13} />
+                  </button>
+                  {/* Allow picking a different image without clearing first */}
+                  <label className="absolute right-2 bottom-2 cursor-pointer rounded-lg bg-black/50 px-2.5 py-1 text-[11px] font-semibold text-white transition-colors hover:bg-black/70">
+                    Change
+                    <input
+                      type="file"
+                      accept="image/jpeg,image/jpg,image/png,image/webp"
+                      className="hidden"
+                      {...register("image", {
+                        validate: {
+                          type: (files) =>
+                            !files?.[0] ||
+                            ALLOWED_TYPES.includes(files[0].type) ||
+                            "Only JPEG, PNG, or WebP images are allowed.",
+                          size: (files) =>
+                            !files?.[0] ||
+                            files[0].size <= MAX_IMAGE_SIZE_MB * 1024 * 1024 ||
+                            `Image must be under ${MAX_IMAGE_SIZE_MB} MB.`,
+                        },
+                        onChange: handleImageChange,
+                      })}
+                    />
+                  </label>
+                </div>
+              ) : (
+                // ── Empty upload zone ──────────────────────────────────────
+                <label
+                  className={`flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed px-4 py-6 transition-colors ${
+                    errors.image
+                      ? "border-red-300 bg-red-50"
+                      : "border-gray-200 hover:border-green-300 hover:bg-green-50/40"
+                  }`}
+                >
+                  <ImagePlus
+                    size={22}
+                    className={errors.image ? "text-red-400" : "text-gray-300"}
+                  />
+                  <span className="text-[12px] text-gray-400">
+                    Click to upload a project image
+                  </span>
+                  <span className="text-[11px] text-gray-300">
+                    JPEG, PNG, WebP · Max {MAX_IMAGE_SIZE_MB} MB
+                  </span>
+                  <input
+                    type="file"
+                    accept="image/jpeg,image/jpg,image/png,image/webp"
+                    className="hidden"
+                    {...register("image", {
+                      validate: {
+                        type: (files) =>
+                          !files?.[0] ||
+                          ALLOWED_TYPES.includes(files[0].type) ||
+                          "Only JPEG, PNG, or WebP images are allowed.",
+                        size: (files) =>
+                          !files?.[0] ||
+                          files[0].size <= MAX_IMAGE_SIZE_MB * 1024 * 1024 ||
+                          `Image must be under ${MAX_IMAGE_SIZE_MB} MB.`,
+                      },
+                      onChange: handleImageChange,
+                    })}
+                  />
+                </label>
+              )}
+
+              {errors.image && (
+                <p className="text-[11px] text-red-500">
+                  {errors.image.message}
+                </p>
+              )}
+            </div>
+
             {/* Project Name */}
             <div className="flex flex-col gap-1.5">
               <label className="text-[11px] font-bold tracking-widest text-gray-400 uppercase">

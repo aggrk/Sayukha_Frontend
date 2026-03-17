@@ -2,8 +2,20 @@
 
 import { useCallback, useState } from "react";
 import useFetch from "../../../hooks/useFetch";
-import { Plus, Pencil, Trash2, FolderOpen, FileText } from "lucide-react";
-import { LIMIT, formatCurrency, formatDate } from "../../../lib/utils";
+import {
+  Plus,
+  Pencil,
+  Trash2,
+  FolderOpen,
+  FileText,
+  ImageOff,
+} from "lucide-react";
+import {
+  BASE_URL,
+  LIMIT,
+  formatCurrency,
+  formatDate,
+} from "../../../lib/utils";
 import Pagination from "../../ui/Pagination";
 import ProjectModal from "./ProjectModal";
 import DeleteModal from "./DeleteModal";
@@ -23,7 +35,6 @@ function StatusBadge({ status }) {
   };
   const label = status?.replace("_", " ") ?? "—";
   const classes = map[status] ?? "bg-gray-100 text-gray-600 border-gray-200";
-
   return (
     <span
       className={`inline-block rounded-full border px-2.5 py-1 text-[10px] font-bold tracking-widest uppercase ${classes}`}
@@ -50,10 +61,7 @@ export default function ProjectsPage() {
     data: projectData,
     isLoading,
     isError,
-  } = useFetch("projects", endPoint, {
-    page: currentPage,
-    limit: LIMIT,
-  });
+  } = useFetch("projects", endPoint, { page: currentPage, limit: LIMIT });
 
   const projects = projectData?.data ?? [];
   const totalCount = projectData?.results ?? 0;
@@ -97,15 +105,13 @@ export default function ProjectsPage() {
             </p>
           </div>
           {user?.data?.role === "admin" && (
-            <div className="flex items-center gap-2.5">
-              <button
-                onClick={() => setShowAddModal(true)}
-                className="from-green to-green-light inline-flex cursor-pointer items-center gap-2 rounded-xl bg-linear-to-r px-5 py-2.5 text-sm font-semibold whitespace-nowrap text-white shadow-md shadow-[#0b6b3a35] transition-all duration-200 hover:-translate-y-px hover:opacity-90"
-              >
-                <Plus size={16} />
-                Add Project
-              </button>
-            </div>
+            <button
+              onClick={() => setShowAddModal(true)}
+              className="from-green to-green-light inline-flex cursor-pointer items-center gap-2 rounded-xl bg-linear-to-r px-5 py-2.5 text-sm font-semibold whitespace-nowrap text-white shadow-md shadow-[#0b6b3a35] transition-all duration-200 hover:-translate-y-px hover:opacity-90"
+            >
+              <Plus size={16} />
+              Add Project
+            </button>
           )}
         </div>
 
@@ -177,20 +183,39 @@ export default function ProjectsPage() {
                       index % 2 === 0 ? "bg-white" : "bg-white-soft"
                     }`}
                   >
-                    {/* Project Name + Code */}
+                    {/* Project Name + Code + Image */}
                     <td className="px-5 py-4 align-middle">
-                      <p className="leading-snug font-semibold text-black">
-                        {project.project_name || "—"}
-                      </p>
-                      <span className="text-green mt-1 inline-block rounded-md border border-green-200 bg-green-50 px-2 py-0.5 text-[10px] font-bold tracking-widest uppercase">
-                        {project.project_code || "N/A"}
-                      </span>
-                      {project.description && (
-                        <p className="mt-1 max-w-50 truncate text-xs text-gray-400">
-                          {project.description}
-                        </p>
-                      )}
+                      <div className="flex items-center gap-3">
+                        {/* Thumbnail */}
+                        {project.image_path ? (
+                          <img
+                            src={`${BASE_URL}/${project.image_path}`}
+                            alt={project.project_name}
+                            className="h-10 w-10 shrink-0 rounded-lg object-cover"
+                          />
+                        ) : (
+                          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-gray-100">
+                            <ImageOff size={14} className="text-gray-300" />
+                          </div>
+                        )}
+
+                        <div className="min-w-0">
+                          <p className="leading-snug font-semibold text-black">
+                            {project.project_name || "—"}
+                          </p>
+                          <span className="text-green mt-1 inline-block rounded-md border border-green-200 bg-green-50 px-2 py-0.5 text-[10px] font-bold tracking-widest uppercase">
+                            {project.project_code || "N/A"}
+                          </span>
+                          {project.description && (
+                            <p className="mt-1 max-w-50 truncate text-xs text-gray-400">
+                              {project.description}
+                            </p>
+                          )}
+                        </div>
+                      </div>
                     </td>
+
+                    {/* Supervisor */}
                     <td className="px-5 py-4 align-middle">
                       <p className="leading-snug font-semibold text-black">
                         {project.project_supervisor_name || "—"}
@@ -256,7 +281,6 @@ export default function ProjectsPage() {
 
                         {user?.data?.role === "admin" && (
                           <>
-                            {" "}
                             <ActionDropdown
                               onClose={() => setOpenDropdown(null)}
                               onSelectEmployee={(employeeId) =>
@@ -269,7 +293,6 @@ export default function ProjectsPage() {
                               isOpen={openDropdown === project.id}
                               project={project}
                             />
-                            {/* Edit */}
                             <button
                               onClick={() => setEditProject(project)}
                               className="bg-green-light/20 text-green hover:bg-green-light/30 flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg transition-colors"
@@ -277,7 +300,6 @@ export default function ProjectsPage() {
                             >
                               <Pencil size={14} />
                             </button>
-                            {/* Delete */}
                             <button
                               onClick={() => setDeleteProject(project)}
                               className="text-red flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg bg-red-50 transition-colors hover:bg-red-100"
@@ -296,16 +318,14 @@ export default function ProjectsPage() {
           </div>
         )}
 
-        {/* Pagination + Footer */}
+        {/* Pagination */}
         {!isLoading && !isError && projects.length > 0 && (
-          <>
-            <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              totalCount={totalCount}
-              onChange={handlePageChange}
-            />
-          </>
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            totalCount={totalCount}
+            onChange={handlePageChange}
+          />
         )}
       </div>
 

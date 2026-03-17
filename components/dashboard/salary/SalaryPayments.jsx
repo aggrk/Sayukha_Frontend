@@ -2,13 +2,18 @@
 
 import { useCallback, useState } from "react";
 import useFetch from "../../../hooks/useFetch";
-import { Banknote, ChevronDown } from "lucide-react";
+import { Banknote, Check, ChevronDown, Pencil, Trash2, X } from "lucide-react";
 import { LIMIT, formatCurrency, formatDate } from "../../../lib/utils";
 import Pagination from "../../ui/Pagination";
 import ActionDropdown from "../employees/ActionDropdown";
 import SalaryModal from "../employees/SalaryModal";
 import MonthPicker from "../../ui/MonthPicker";
 import { useAuth } from "../../../hooks/useAuth";
+import { useQueryClient } from "@tanstack/react-query";
+import api from "../../../lib/api";
+import toast from "react-hot-toast";
+
+// ─── Status badge ─────────────────────────────────────────────────────────────
 
 function StatusBadge({ status }) {
   const map = {
@@ -18,7 +23,6 @@ function StatusBadge({ status }) {
   };
   const label = status?.replace("_", " ") ?? "—";
   const classes = map[status] ?? "bg-gray-100 text-gray-600 border-gray-200";
-
   return (
     <span
       className={`inline-block rounded-full border px-2.5 py-1 text-[10px] font-bold tracking-widest uppercase ${classes}`}
@@ -28,13 +32,36 @@ function StatusBadge({ status }) {
   );
 }
 
+// ─── Inline editable cell ─────────────────────────────────────────────────────
+
+function EditableCell({ type = "text", value, onChange, placeholder = "" }) {
+  return (
+    <input
+      type={type}
+      value={value ?? ""}
+      onChange={(e) => onChange(e.target.value)}
+      placeholder={placeholder}
+      className="w-full min-w-24 rounded-lg border border-green-300 bg-green-50 px-2 py-1.5 text-xs text-gray-700 outline-none focus:border-green-500 focus:ring-1 focus:ring-green-200"
+    />
+  );
+}
+
+// ─── Main component ───────────────────────────────────────────────────────────
+
 export default function SalaryPayments() {
   const [currentPage, setCurrentPage] = useState(1);
   const [openDropdown, setOpenDropdown] = useState(null);
   const [modal, setModal] = useState(null);
   const [selectedMonth, setSelectedMonth] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("");
+  const [editingId, setEditingId] = useState(null);
+  const [editValues, setEditValues] = useState({});
+  const [savingId, setSavingId] = useState(null);
+  const [confirmDeleteId, setConfirmDeleteId] = useState(null);
+  const [deletingId, setDeletingId] = useState(null);
+
   const { user } = useAuth();
+  const queryClient = useQueryClient();
 
   const queryParams = {
     page: currentPage,
@@ -52,6 +79,8 @@ export default function SalaryPayments() {
   const salaries = salaryData?.data ?? [];
   const totalCount = salaryData?.result ?? 0;
   const totalPages = Math.ceil(totalCount / LIMIT);
+
+  // ── Filters ────────────────────────────────────────────────────────────────
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
@@ -80,6 +109,83 @@ export default function SalaryPayments() {
     setOpenDropdown((prev) => (prev === id ? null : id));
   }, []);
 
+  // ── Inline edit ────────────────────────────────────────────────────────────
+
+  const startEdit = (salary) => {
+    setEditingId(salary.id);
+    setConfirmDeleteId(null);
+    const original = {
+      month: salary.payment_month?.slice(0, 7) ?? "",
+      advance_amount: salary.advance_amount ?? "",
+      full_payment_amount: salary.full_payment_amount ?? "",
+      notes: salary.notes ?? "",
+    };
+    // Store _original so saveEdit can diff and only send changed fields
+    setEditValues({ ...original, _original: original });
+  };
+
+  const cancelEdit = () => {
+    setEditingId(null);
+    setEditValues({});
+  };
+
+  const handleEditChange = (field, value) => {
+    setEditValues((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const saveEdit = async (id) => {
+    setSavingId(id);
+    try {
+      const orig = editValues._original;
+      const payload = {};
+
+      // Only include fields the user actually changed
+      if (editValues.month !== orig.month) payload.month = editValues.month;
+      if (String(editValues.advance_amount) !== String(orig.advance_amount))
+        payload.advance_amount = editValues.advance_amount;
+      if (
+        String(editValues.full_payment_amount) !==
+        String(orig.full_payment_amount)
+      )
+        payload.full_payment_amount = editValues.full_payment_amount;
+      if (editValues.notes !== orig.notes) payload.notes = editValues.notes;
+
+      if (Object.keys(payload).length === 0) {
+        toast("No changes to save.");
+        setEditingId(null);
+        return;
+      }
+
+      await api.patch(`/salary-payments/${id}`, payload);
+      await queryClient.invalidateQueries({ queryKey: ["salary-payments"] });
+      setEditingId(null);
+      setEditValues({});
+      toast.success("Payment record updated.");
+    } catch (err) {
+      toast.error(err?.response?.data?.message ?? "Failed to update record.");
+    } finally {
+      setSavingId(null);
+    }
+  };
+
+  // ── Delete ─────────────────────────────────────────────────────────────────
+
+  const handleDelete = async (id) => {
+    setDeletingId(id);
+    try {
+      await api.delete(`/salary-payments/${id}`);
+      await queryClient.invalidateQueries({ queryKey: ["salary-payments"] });
+      setConfirmDeleteId(null);
+      toast.success("Payment record deleted.");
+    } catch (err) {
+      toast.error(err?.response?.data?.message ?? "Failed to delete record.");
+    } finally {
+      setDeletingId(null);
+    }
+  };
+
+  // ─────────────────────────────────────────────────────────────────────────
+
   return (
     <>
       {modal && (
@@ -106,7 +212,6 @@ export default function SalaryPayments() {
 
           {/* Filter Bar */}
           <div className="bg-gray-light-soft mb-4 flex flex-wrap items-end gap-4 rounded-2xl border border-green-200 px-5 py-4">
-            {/* Month Picker */}
             <div className="flex flex-col gap-1.5">
               <label className="text-dark flex items-center gap-1 text-[10px] font-bold tracking-widest uppercase">
                 Payment Month
@@ -114,7 +219,6 @@ export default function SalaryPayments() {
               <MonthPicker value={selectedMonth} onChange={handleMonthChange} />
             </div>
 
-            {/* Status */}
             <div className="flex flex-col gap-1.5">
               <label className="text-dark flex items-center gap-1 text-[10px] font-bold tracking-widest uppercase">
                 Status
@@ -137,7 +241,6 @@ export default function SalaryPayments() {
               </div>
             </div>
 
-            {/* Active pills + clear */}
             {hasActiveFilters && (
               <div className="ml-auto flex items-center gap-2 self-end pb-0.5">
                 {selectedMonth && (
@@ -152,7 +255,7 @@ export default function SalaryPayments() {
                 )}
                 <button
                   onClick={handleClearFilters}
-                  className="cursor pointer rounded-full border border-red-200 bg-white px-3 py-1 text-[11px] font-semibold text-red-400 transition-colors hover:bg-red-50"
+                  className="cursor-pointer rounded-full border border-red-200 bg-white px-3 py-1 text-[11px] font-semibold text-red-400 transition-colors hover:bg-red-50"
                 >
                   Clear filters
                 </button>
@@ -220,104 +323,255 @@ export default function SalaryPayments() {
                   </tr>
                 </thead>
                 <tbody>
-                  {salaries.map((salary, index) => (
-                    <tr
-                      key={salary.id ?? index}
-                      className={`border-b border-gray-50 transition-colors duration-150 hover:bg-green-50/40 ${
-                        index % 2 === 0 ? "bg-white" : "bg-white-soft"
-                      }`}
-                    >
-                      <td className="px-5 py-4 align-middle">
-                        <p className="leading-snug font-semibold text-black">
-                          {salary.employee_name || "—"}
-                        </p>
-                        <span className="text-green mt-1 inline-block rounded-md border border-green-200 bg-green-50 px-2 py-0.5 text-[10px] font-bold tracking-widest uppercase">
-                          ID #{salary.employee_id ?? "N/A"}
-                        </span>
-                      </td>
-                      <td className="px-5 py-4 align-middle text-gray-600">
-                        {formatDate(salary.payment_month)}
-                      </td>
-                      <td className="px-5 py-4 align-middle font-bold whitespace-nowrap text-black tabular-nums">
-                        {formatCurrency(salary.basic_salary)}
-                        <span className="ml-1 text-[10px] font-normal text-gray-400">
-                          TSH
-                        </span>
-                      </td>
-                      <td className="px-5 py-4 align-middle font-bold whitespace-nowrap text-black tabular-nums">
-                        {formatCurrency(salary.advance_amount)}
-                        <span className="ml-1 text-[10px] font-normal text-gray-400">
-                          TSH
-                        </span>
-                      </td>
-                      <td className="px-5 py-4 align-middle text-xs text-gray-500">
-                        {salary.advance_paid_at ? (
-                          formatDate(salary.advance_paid_at)
-                        ) : (
-                          <span className="text-gray-300">—</span>
-                        )}
-                      </td>
-                      <td className="px-5 py-4 align-middle font-bold whitespace-nowrap text-black tabular-nums">
-                        {formatCurrency(salary.full_payment_amount)}
-                        <span className="ml-1 text-[10px] font-normal text-gray-400">
-                          TSH
-                        </span>
-                      </td>
-                      <td className="px-5 py-4 align-middle text-xs text-gray-500">
-                        {salary.full_payment_paid_at ? (
-                          formatDate(salary.full_payment_paid_at)
-                        ) : (
-                          <span className="text-gray-300">—</span>
-                        )}
-                      </td>
-                      <td className="px-5 py-4 align-middle font-bold whitespace-nowrap tabular-nums">
-                        <span
-                          className={
-                            parseFloat(salary.balance) > 0
-                              ? "text-red"
-                              : "text-green"
-                          }
-                        >
-                          {formatCurrency(salary.balance)}
-                        </span>
-                        <span className="ml-1 text-[10px] font-normal text-gray-400">
-                          TSH
-                        </span>
-                      </td>
-                      <td className="px-5 py-4 align-middle">
-                        <StatusBadge status={salary.status} />
-                      </td>
-                      <td className="max-w-40 truncate px-5 py-4 align-middle text-xs text-gray-400">
-                        {salary.notes || "—"}
-                      </td>
-                      <td className="px-5 py-4 align-middle">
-                        {user?.data?.role === "admin" && (
-                          <ActionDropdown
-                            employee={{
-                              status:
-                                salary.status === "paid"
-                                  ? "inactive"
-                                  : "active",
-                            }}
-                            isOpen={openDropdown === salary.id}
-                            onToggle={() => handleToggle(salary.id)}
-                            onClose={() => setOpenDropdown(null)}
-                            onSelectAction={(type) =>
-                              setModal({
-                                employee: {
-                                  id: salary.employee_id,
-                                  name: salary.employee_name,
-                                  basic_salary: salary.basic_salary,
-                                  account_number: salary.account_number,
-                                },
-                                type,
-                              })
+                  {salaries.map((salary, index) => {
+                    const isEditing = editingId === salary.id;
+                    const isPaid = salary.status === "paid";
+                    const isConfirmingDelete = confirmDeleteId === salary.id;
+
+                    return (
+                      <tr
+                        key={salary.id ?? index}
+                        className={`border-b border-gray-50 transition-colors duration-150 ${
+                          isEditing
+                            ? "bg-green-50/60"
+                            : `hover:bg-green-50/40 ${index % 2 === 0 ? "bg-white" : "bg-white-soft"}`
+                        }`}
+                      >
+                        {/* Employee */}
+                        <td className="px-5 py-4 align-middle">
+                          <p className="leading-snug font-semibold text-black">
+                            {salary.employee_name || "—"}
+                          </p>
+                          <span className="text-green mt-1 inline-block rounded-md border border-green-200 bg-green-50 px-2 py-0.5 text-[10px] font-bold tracking-widest uppercase">
+                            ID #{salary.employee_id ?? "N/A"}
+                          </span>
+                        </td>
+
+                        {/* Payment Month */}
+                        <td className="px-5 py-4 align-middle text-gray-600">
+                          {isEditing ? (
+                            <EditableCell
+                              type="month"
+                              value={editValues.month}
+                              onChange={(v) => handleEditChange("month", v)}
+                            />
+                          ) : (
+                            formatDate(salary.payment_month)
+                          )}
+                        </td>
+
+                        {/* Basic Salary — never editable */}
+                        <td className="px-5 py-4 align-middle font-bold whitespace-nowrap text-black tabular-nums">
+                          {formatCurrency(salary.basic_salary)}
+                          <span className="ml-1 text-[10px] font-normal text-gray-400">
+                            TSH
+                          </span>
+                        </td>
+
+                        {/* Advance */}
+                        <td className="px-5 py-4 align-middle font-bold whitespace-nowrap text-black tabular-nums">
+                          {isEditing ? (
+                            <EditableCell
+                              type="number"
+                              value={editValues.advance_amount}
+                              onChange={(v) =>
+                                handleEditChange("advance_amount", v)
+                              }
+                              placeholder="0"
+                            />
+                          ) : (
+                            <>
+                              {formatCurrency(salary.advance_amount)}
+                              <span className="ml-1 text-[10px] font-normal text-gray-400">
+                                TSH
+                              </span>
+                            </>
+                          )}
+                        </td>
+
+                        {/* Advance Paid At */}
+                        <td className="px-5 py-4 align-middle text-xs text-gray-500">
+                          {salary.advance_paid_at ? (
+                            formatDate(salary.advance_paid_at)
+                          ) : (
+                            <span className="text-gray-300">—</span>
+                          )}
+                        </td>
+
+                        {/* Full Payment */}
+                        <td className="px-5 py-4 align-middle font-bold whitespace-nowrap text-black tabular-nums">
+                          {isEditing ? (
+                            <EditableCell
+                              type="number"
+                              value={editValues.full_payment_amount}
+                              onChange={(v) =>
+                                handleEditChange("full_payment_amount", v)
+                              }
+                              placeholder="0"
+                            />
+                          ) : (
+                            <>
+                              {formatCurrency(salary.full_payment_amount)}
+                              <span className="ml-1 text-[10px] font-normal text-gray-400">
+                                TSH
+                              </span>
+                            </>
+                          )}
+                        </td>
+
+                        {/* Full Paid At */}
+                        <td className="px-5 py-4 align-middle text-xs text-gray-500">
+                          {salary.full_payment_paid_at ? (
+                            formatDate(salary.full_payment_paid_at)
+                          ) : (
+                            <span className="text-gray-300">—</span>
+                          )}
+                        </td>
+
+                        {/* Balance — always computed, never editable */}
+                        <td className="px-5 py-4 align-middle font-bold whitespace-nowrap tabular-nums">
+                          <span
+                            className={
+                              parseFloat(salary.balance) > 0
+                                ? "text-red"
+                                : "text-green"
                             }
-                          />
-                        )}
-                      </td>
-                    </tr>
-                  ))}
+                          >
+                            {formatCurrency(salary.balance)}
+                          </span>
+                          <span className="ml-1 text-[10px] font-normal text-gray-400">
+                            TSH
+                          </span>
+                        </td>
+
+                        {/* Status */}
+                        <td className="px-5 py-4 align-middle">
+                          <StatusBadge status={salary.status} />
+                        </td>
+
+                        {/* Notes */}
+                        <td className="max-w-40 px-5 py-4 align-middle text-xs text-gray-400">
+                          {isEditing ? (
+                            <EditableCell
+                              value={editValues.notes}
+                              onChange={(v) => handleEditChange("notes", v)}
+                              placeholder="Notes..."
+                            />
+                          ) : (
+                            <span className="block truncate">
+                              {salary.notes || "—"}
+                            </span>
+                          )}
+                        </td>
+
+                        {/* Actions */}
+                        <td className="px-5 py-4 align-middle">
+                          {user?.data?.role === "admin" && (
+                            <div className="flex items-center gap-2">
+                              {isEditing ? (
+                                // ── Save / Cancel ──────────────────────────
+                                <>
+                                  <button
+                                    onClick={() => saveEdit(salary.id)}
+                                    disabled={savingId === salary.id}
+                                    className="text-green flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg bg-green-100 transition-colors hover:bg-green-200 disabled:opacity-60"
+                                    title="Save changes"
+                                  >
+                                    {savingId === salary.id ? (
+                                      <span className="border-green h-3.5 w-3.5 animate-spin rounded-full border-2 border-t-transparent" />
+                                    ) : (
+                                      <Check size={14} />
+                                    )}
+                                  </button>
+                                  <button
+                                    onClick={cancelEdit}
+                                    className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg bg-gray-100 text-gray-500 transition-colors hover:bg-gray-200"
+                                    title="Cancel"
+                                  >
+                                    <X size={14} />
+                                  </button>
+                                </>
+                              ) : isConfirmingDelete ? (
+                                // ── Delete confirmation ────────────────────
+                                <div className="flex items-center gap-1.5">
+                                  <span className="text-[11px] font-semibold whitespace-nowrap text-gray-500">
+                                    Sure?
+                                  </span>
+                                  <button
+                                    onClick={() => handleDelete(salary.id)}
+                                    disabled={deletingId === salary.id}
+                                    className="text-red flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg bg-red-100 transition-colors hover:bg-red-200 disabled:opacity-60"
+                                    title="Confirm delete"
+                                  >
+                                    {deletingId === salary.id ? (
+                                      <span className="border-red h-3.5 w-3.5 animate-spin rounded-full border-2 border-t-transparent" />
+                                    ) : (
+                                      <Check size={14} />
+                                    )}
+                                  </button>
+                                  <button
+                                    onClick={() => setConfirmDeleteId(null)}
+                                    className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg bg-gray-100 text-gray-500 transition-colors hover:bg-gray-200"
+                                    title="Cancel"
+                                  >
+                                    <X size={14} />
+                                  </button>
+                                </div>
+                              ) : (
+                                // ── Normal actions ─────────────────────────
+                                <>
+                                  <ActionDropdown
+                                    employee={{
+                                      status: isPaid ? "inactive" : "active",
+                                    }}
+                                    isOpen={openDropdown === salary.id}
+                                    onToggle={() => handleToggle(salary.id)}
+                                    onClose={() => setOpenDropdown(null)}
+                                    onSelectAction={(type) =>
+                                      setModal({
+                                        employee: {
+                                          id: salary.employee_id,
+                                          name: salary.employee_name,
+                                          basic_salary: salary.basic_salary,
+                                          account_number: salary.account_number,
+                                        },
+                                        type,
+                                      })
+                                    }
+                                  />
+
+                                  {/* Edit — hidden for paid records */}
+                                  {!isPaid && (
+                                    <button
+                                      onClick={() => startEdit(salary)}
+                                      className="bg-green/10 hover:bg-green/20 text-green flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg transition-colors"
+                                      title="Edit record"
+                                    >
+                                      <Pencil size={14} />
+                                    </button>
+                                  )}
+
+                                  {/* Delete — hidden for paid records */}
+                                  {!isPaid && (
+                                    <button
+                                      onClick={() => {
+                                        setConfirmDeleteId(salary.id);
+                                        setEditingId(null);
+                                      }}
+                                      className="text-red flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg bg-red-50 transition-colors hover:bg-red-100"
+                                      title="Delete record"
+                                    >
+                                      <Trash2 size={14} />
+                                    </button>
+                                  )}
+                                </>
+                              )}
+                            </div>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>

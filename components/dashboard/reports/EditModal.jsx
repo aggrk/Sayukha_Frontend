@@ -3,13 +3,23 @@
 import { useForm } from "react-hook-form";
 import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { Loader2, Pencil, X } from "lucide-react";
+import { Loader2, Pencil, Paperclip, X } from "lucide-react";
 import api from "../../../lib/api";
+
+const ACCEPTED_TYPES = [
+  "application/pdf",
+  "application/msword",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  "application/vnd.ms-excel",
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+];
+const MAX_SIZE_MB = 10;
 
 export default function EditModal({ report, onClose }) {
   const queryClient = useQueryClient();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [selectedFileName, setSelectedFileName] = useState(null);
 
   const {
     register,
@@ -17,7 +27,7 @@ export default function EditModal({ report, onClose }) {
     formState: { errors },
   } = useForm({
     defaultValues: {
-      report_summary: report?.report_summary ?? "",
+      notes: report?.notes ?? "",
       report_date: report?.report_date?.slice(0, 10) ?? "",
     },
   });
@@ -26,7 +36,17 @@ export default function EditModal({ report, onClose }) {
     setError("");
     setLoading(true);
     try {
-      await api.patch(`/reports/${report.id}`, data);
+      const formData = new FormData();
+      formData.append("report_date", data.report_date);
+      // notes is optional — only append if non-empty
+      if (data.notes?.trim()) formData.append("notes", data.notes.trim());
+      // file is optional — only append if the user picked a new one
+      if (data.file?.[0]) formData.append("file", data.file[0]);
+
+      await api.patch(`/reports/${report.id}`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
       await queryClient.invalidateQueries({ queryKey: ["reports"] });
       onClose();
     } catch (err) {
@@ -62,49 +82,118 @@ export default function EditModal({ report, onClose }) {
           </button>
         </div>
 
-        {/* Scrollable Form Body */}
+        {/* Form */}
         <form
           onSubmit={handleSubmit(onSubmit)}
           className="flex flex-1 flex-col overflow-hidden"
         >
           <div className="flex flex-1 flex-col gap-4 overflow-y-auto px-6 py-5">
             {/* Report Date */}
-            <div className="grid grid-cols-2 gap-3">
-              <div className="col-span-2 flex flex-col gap-1.5">
-                <label className="text-[11px] font-bold tracking-widest text-gray-400 uppercase">
-                  Report Date <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="date"
-                  {...register("report_date", {
-                    required: "Report date is required.",
-                  })}
-                  className={`focus:border-green focus:ring-green/10 text-dark rounded-xl border px-4 py-2.5 text-sm transition-colors outline-none focus:ring-2 ${errors.report_date ? "border-red-400 bg-red-50" : "border-gray-200"}`}
-                />
-                {errors.report_date && (
-                  <p className="text-[11px] text-red-500">
-                    {errors.report_date.message}
-                  </p>
-                )}
-              </div>
-            </div>
-
-            {/* Report Summary */}
             <div className="flex flex-col gap-1.5">
               <label className="text-[11px] font-bold tracking-widest text-gray-400 uppercase">
-                Report Summary <span className="text-red-500">*</span>
+                Report Date <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="date"
+                {...register("report_date", {
+                  required: "Report date is required.",
+                })}
+                className={`focus:border-green focus:ring-green/10 text-dark rounded-xl border px-4 py-2.5 text-sm transition-colors outline-none focus:ring-2 ${
+                  errors.report_date
+                    ? "border-red-400 bg-red-50"
+                    : "border-gray-200"
+                }`}
+              />
+              {errors.report_date && (
+                <p className="text-[11px] text-red-500">
+                  {errors.report_date.message}
+                </p>
+              )}
+            </div>
+
+            {/* Notes (optional) */}
+            <div className="flex flex-col gap-1.5">
+              <label className="text-[11px] font-bold tracking-widest text-gray-400 uppercase">
+                Notes{" "}
+                <span className="font-normal text-gray-400 normal-case">
+                  (optional)
+                </span>
               </label>
               <textarea
-                rows={4}
-                placeholder="Enter report summary..."
-                {...register("report_summary", {
-                  required: "Report summary is required.",
-                })}
-                className={`focus:border-green focus:ring-green/10 text-dark resize-none rounded-xl border px-4 py-2.5 text-sm transition-colors outline-none focus:ring-2 ${errors.report_summary ? "border-red-400 bg-red-50" : "border-gray-200"}`}
+                rows={3}
+                placeholder="Add any notes about this report..."
+                {...register("notes")}
+                className="focus:border-green focus:ring-green/10 text-dark resize-none rounded-xl border border-gray-200 px-4 py-2.5 text-sm transition-colors outline-none focus:ring-2"
               />
-              {errors.report_summary && (
+            </div>
+
+            {/* Replace File (optional) */}
+            <div className="flex flex-col gap-1.5">
+              <label className="text-[11px] font-bold tracking-widest text-gray-400 uppercase">
+                Replace File{" "}
+                <span className="font-normal text-gray-400 normal-case">
+                  (optional)
+                </span>
+              </label>
+
+              {/* Current file pill */}
+              <div className="flex items-center gap-2 rounded-lg border border-gray-200 bg-gray-50 px-3 py-2">
+                <Paperclip size={13} className="shrink-0 text-gray-400" />
+                <p
+                  className="min-w-0 flex-1 truncate text-[12px] text-gray-500"
+                  title={report.file_original_name}
+                >
+                  Current:{" "}
+                  <span className="font-medium text-gray-700">
+                    {report.file_original_name ?? "—"}
+                  </span>
+                </p>
+              </div>
+
+              {/* File picker */}
+              <label
+                className={`flex cursor-pointer items-center gap-3 rounded-xl border-2 border-dashed px-4 py-3 transition-colors ${
+                  errors.file
+                    ? "border-red-300 bg-red-50"
+                    : "border-gray-200 hover:border-green-300 hover:bg-green-50/40"
+                }`}
+              >
+                <Paperclip size={15} className="shrink-0 text-gray-400" />
+                <span className="text-[13px] text-gray-500">
+                  {selectedFileName ?? "Click to upload a new file…"}
+                </span>
+                <input
+                  type="file"
+                  accept=".pdf,.doc,.docx,.xls,.xlsx"
+                  className="hidden"
+                  {...register("file", {
+                    validate: {
+                      type: (files) => {
+                        if (!files?.[0]) return true; // optional
+                        return (
+                          ACCEPTED_TYPES.includes(files[0].type) ||
+                          "Only PDF, Word, or Excel files are allowed."
+                        );
+                      },
+                      size: (files) => {
+                        if (!files?.[0]) return true;
+                        return (
+                          files[0].size <= MAX_SIZE_MB * 1024 * 1024 ||
+                          `File must be under ${MAX_SIZE_MB} MB.`
+                        );
+                      },
+                    },
+                    onChange: (e) => {
+                      const file = e.target.files?.[0];
+                      setSelectedFileName(file ? file.name : null);
+                    },
+                  })}
+                />
+              </label>
+
+              {errors.file && (
                 <p className="text-[11px] text-red-500">
-                  {errors.report_summary.message}
+                  {errors.file.message}
                 </p>
               )}
             </div>
