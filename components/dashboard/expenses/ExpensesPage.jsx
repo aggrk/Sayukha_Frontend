@@ -1,22 +1,27 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import useFetch from "../../../hooks/useFetch";
 import api from "../../../lib/api";
-import { Plus, Pencil, Trash2, Download } from "lucide-react";
+import { Plus, Pencil, Trash2, Download, Upload } from "lucide-react";
 import Pagination from "../../ui/Pagination";
 import { LIMIT } from "../../../lib/utils";
 import ExpenseModal from "./ExpenseModal";
 import DeleteModal from "./DeleteModal";
 import { useAuth } from "../../../hooks/useAuth";
 import toast from "react-hot-toast";
+import axios from "axios";
 
 export default function ExpensesPage() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [editExpense, setEditExpense] = useState(null);
   const [deleteExpense, setDeleteExpense] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [isImporting, setIsImporting] = useState(false);
+  const fileInputRef = useRef(null);
   const { user } = useAuth();
+  const queryClient = useQueryClient();
 
   const {
     data: expenses,
@@ -38,19 +43,67 @@ export default function ExpensesPage() {
 
   const handleExportExcel = async () => {
     try {
-      const response = await api.get("/expenses/export/excel", {
+      // Use a raw axios instance to bypass any JSON interceptors on your api
+      // instance that would throw when receiving a blob instead of JSON
+      const token = api.defaults.headers.common["Authorization"];
+      const baseURL = api.defaults.baseURL;
+
+      const response = await axios.get(`${baseURL}/expenses/export/excel`, {
         responseType: "blob",
+        headers: {
+          ...(token ? { Authorization: token } : {}),
+        },
       });
+
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement("a");
       link.href = url;
       link.setAttribute("download", "expenses.xlsx");
       document.body.appendChild(link);
       link.click();
-      link.remove();
-      window.URL.revokeObjectURL(url);
+      document.body.removeChild(link);
+
+      // Delay revoke slightly so the browser has time to start the download
+      setTimeout(() => window.URL.revokeObjectURL(url), 150);
     } catch (error) {
       toast.error("Failed to export expenses");
+    }
+  };
+
+  const handleImportClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Reset so the same file can be re-selected if needed
+    e.target.value = "";
+
+    if (!file.name.endsWith(".xlsx") && !file.name.endsWith(".xls")) {
+      toast.error("Please upload a valid Excel file (.xlsx or .xls)");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    setIsImporting(true);
+    try {
+      const response = await api.post("/expenses/import/excel", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      toast.success(response.data.message ?? "Expenses imported successfully");
+      // Invalidate the expenses cache so React Query automatically refetches
+      // This also refreshes any other component on the page using the "expenses" query key
+      queryClient.invalidateQueries({ queryKey: ["expenses"] });
+    } catch (error) {
+      const message =
+        error.response?.data?.message ?? "Failed to import expenses";
+      toast.error(message);
+    } finally {
+      setIsImporting(false);
     }
   };
 
@@ -75,6 +128,35 @@ export default function ExpensesPage() {
               <Plus size={16} />
               Add Expense
             </button>
+
+            {/* Hidden file input */}
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".xlsx,.xls"
+              className="hidden"
+              onChange={handleFileChange}
+            />
+
+            {/* Import button */}
+            <button
+              onClick={handleImportClick}
+              disabled={isImporting}
+              className="text-green inline-flex cursor-pointer items-center gap-2 rounded-xl border border-gray-200 bg-white px-5 py-2.5 text-sm font-semibold whitespace-nowrap shadow-sm transition-all duration-200 hover:-translate-y-px hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {isImporting ? (
+                <>
+                  <div className="border-t-green h-4 w-4 animate-spin rounded-full border-2 border-gray-200" />
+                  Importing...
+                </>
+              ) : (
+                <>
+                  <Upload size={16} />
+                  Import Excel
+                </>
+              )}
+            </button>
+
             {expenses?.data?.length > 0 && (
               <button
                 onClick={handleExportExcel}
@@ -236,17 +318,15 @@ export default function ExpensesPage() {
           </div>
         )}
 
-        {/* Pagination + footer */}
+        {/* Pagination */}
         {!isLoading && !isError && records.length > 0 && (
-          <>
-            <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              totalCount={totalCount}
-              onChange={handlePageChange}
-              tableName="expenses"
-            />
-          </>
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            totalCount={totalCount}
+            onChange={handlePageChange}
+            tableName="expenses"
+          />
         )}
       </div>
 
