@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import useFetch from "../../../hooks/useFetch";
 import api from "../../../lib/api";
-import { Plus, Pencil, Trash2, Download, Upload } from "lucide-react";
+import { Plus, Pencil, Trash2, Download, Upload, Undo2 } from "lucide-react";
 import Pagination from "../../ui/Pagination";
 import { LIMIT } from "../../../lib/utils";
 import ExpenseModal from "./ExpenseModal";
@@ -13,12 +13,17 @@ import { useAuth } from "../../../hooks/useAuth";
 import toast from "react-hot-toast";
 import axios from "axios";
 
+const UNDO_TIMEOUT = 30; // seconds the undo banner stays visible
+
 export default function ExpensesPage() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [editExpense, setEditExpense] = useState(null);
   const [deleteExpense, setDeleteExpense] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [isImporting, setIsImporting] = useState(false);
+  const [undoState, setUndoState] = useState(null);
+  // undoState shape: { ids: number[], secondsLeft: number, timerId: NodeJS.Timeout }
+
   const fileInputRef = useRef(null);
   const { user } = useAuth();
   const queryClient = useQueryClient();
@@ -36,6 +41,13 @@ export default function ExpensesPage() {
   const totalCount = expenses?.results ?? 0;
   const totalPages = Math.ceil(totalCount / LIMIT);
 
+  // Clear the undo timer when the component unmounts so we don't leak intervals
+  useEffect(() => {
+    return () => {
+      if (undoState?.timerId) clearInterval(undoState.timerId);
+    };
+  }, [undoState?.timerId]);
+
   const handlePageChange = (page) => {
     setCurrentPage(page);
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -43,7 +55,7 @@ export default function ExpensesPage() {
 
   const handleExportExcel = async () => {
     try {
-      // Use a raw axios instance to bypass any JSON interceptors on your api
+      // Use a raw axios instance to bypass any JSON interceptors on the api
       // instance that would throw when receiving a blob instead of JSON
       const token = api.defaults.headers.common["Authorization"];
       const baseURL = api.defaults.baseURL;
@@ -94,16 +106,50 @@ export default function ExpensesPage() {
       const response = await api.post("/expenses/import/excel", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
-      toast.success(response.data.message ?? "Expenses imported successfully");
-      // Invalidate the expenses cache so React Query automatically refetches
-      // This also refreshes any other component on the page using the "expenses" query key
+
+      const importedIds = response.data.ids ?? [];
+
       queryClient.invalidateQueries({ queryKey: ["expenses"] });
+      toast.success(response.data.message ?? "Expenses imported successfully");
+
+      // Clear any existing undo timer before starting a new one
+      if (undoState?.timerId) clearInterval(undoState.timerId);
+
+      // Start a countdown — every second decrement secondsLeft until it hits 0
+      let secondsLeft = UNDO_TIMEOUT;
+      const timerId = setInterval(() => {
+        secondsLeft -= 1;
+        setUndoState((prev) => (prev ? { ...prev, secondsLeft } : null));
+        if (secondsLeft <= 0) {
+          clearInterval(timerId);
+          setUndoState(null);
+        }
+      }, 1000);
+
+      setUndoState({ ids: importedIds, secondsLeft, timerId });
     } catch (error) {
       const message =
         error.response?.data?.message ?? "Failed to import expenses";
       toast.error(message);
     } finally {
       setIsImporting(false);
+    }
+  };
+
+  const handleUndo = async () => {
+    if (!undoState) return;
+
+    // Stop the countdown immediately
+    clearInterval(undoState.timerId);
+    const idsToDelete = undoState.ids;
+    setUndoState(null);
+
+    try {
+      await api.delete("/expenses/bulk", { data: { ids: idsToDelete } });
+      queryClient.invalidateQueries({ queryKey: ["expenses"] });
+      toast.success("Import undone successfully");
+    } catch (error) {
+      toast.error("Failed to undo import");
     }
   };
 
@@ -168,6 +214,26 @@ export default function ExpensesPage() {
             )}
           </div>
         </div>
+
+        {/* Undo banner — shown for UNDO_TIMEOUT seconds after a successful import */}
+        {undoState && (
+          <div className="mb-5 flex items-center justify-between rounded-xl border border-green-100 bg-green-50 px-5 py-3 shadow-sm">
+            <p className="text-sm text-gray-600">
+              {undoState.ids.length} expense
+              {undoState.ids.length !== 1 ? "s" : ""} imported.{" "}
+              <span className="text-xs text-gray-400">
+                Undo available for {undoState.secondsLeft}s
+              </span>
+            </p>
+            <button
+              onClick={handleUndo}
+              className="inline-flex items-center cursor-pointer gap-1.5 rounded-lg border border-red-200 bg-white px-3 py-1.5 text-xs font-semibold text-red-500 transition-colors hover:bg-red-50"
+            >
+              <Undo2 size={13} />
+              Undo
+            </button>
+          </div>
+        )}
 
         {/* Loading */}
         {isLoading && (
