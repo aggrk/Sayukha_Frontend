@@ -4,7 +4,16 @@ import { useState, useRef, useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import useFetch from "../../../hooks/useFetch";
 import api from "../../../lib/api";
-import { Plus, Pencil, Trash2, Download, Upload, Undo2 } from "lucide-react";
+import {
+  Plus,
+  Pencil,
+  Trash2,
+  Download,
+  Upload,
+  Undo2,
+  ChevronDown,
+  X,
+} from "lucide-react";
 import Pagination from "../../ui/Pagination";
 import { LIMIT } from "../../../lib/utils";
 import ExpenseModal from "./ExpenseModal";
@@ -13,7 +22,38 @@ import { useAuth } from "../../../hooks/useAuth";
 import toast from "react-hot-toast";
 import axios from "axios";
 
-const UNDO_TIMEOUT = 30; // seconds the undo banner stays visible
+const UNDO_TIMEOUT = 30;
+
+// Date preset helpers
+const DATE_PRESETS = [
+  { label: "Today", value: "today" },
+  { label: "This Week", value: "week" },
+  { label: "This Month", value: "month" },
+  { label: "Custom", value: "custom" },
+];
+
+function getDateRange(preset) {
+  const now = new Date();
+  const pad = (n) => String(n).padStart(2, "0");
+  const fmt = (d) =>
+    `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+
+  if (preset === "today") {
+    const today = fmt(now);
+    return { from: today, to: today };
+  }
+  if (preset === "week") {
+    const day = now.getDay() === 0 ? 6 : now.getDay() - 1; // Monday start
+    const from = new Date(now);
+    from.setDate(now.getDate() - day);
+    return { from: fmt(from), to: fmt(now) };
+  }
+  if (preset === "month") {
+    const from = new Date(now.getFullYear(), now.getMonth(), 1);
+    return { from: fmt(from), to: fmt(now) };
+  }
+  return null;
+}
 
 export default function ExpensesPage() {
   const [showAddModal, setShowAddModal] = useState(false);
@@ -22,26 +62,74 @@ export default function ExpensesPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [isImporting, setIsImporting] = useState(false);
   const [undoState, setUndoState] = useState(null);
-  // undoState shape: { ids: number[], secondsLeft: number, timerId: NodeJS.Timeout }
+
+  // ── Filters ────────────────────────────────────────────────────────────
+  const [selectedCategory, setSelectedCategory] = useState(""); // category id
+  const [datePreset, setDatePreset] = useState("");             // today | week | month | custom | ""
+  const [customFrom, setCustomFrom] = useState("");
+  const [customTo, setCustomTo] = useState("");
+  const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
+  const categoryDropdownRef = useRef(null);
 
   const fileInputRef = useRef(null);
   const { user } = useAuth();
   const queryClient = useQueryClient();
 
+  // ── Categories for filter dropdown ────────────────────────────────────
+  const { data: categoriesData } = useFetch("categories", "/categories");
+  const categories = categoriesData?.data ?? [];
+
+  // ── Build query params from active filters ─────────────────────────────
+  const filterParams = (() => {
+    const params = { page: currentPage, limit: LIMIT };
+
+    if (selectedCategory) params.category_id = selectedCategory;
+
+    const range =
+      datePreset === "custom"
+        ? { from: customFrom, to: customTo }
+        : datePreset
+          ? getDateRange(datePreset)
+          : null;
+
+    if (range?.from) params["expense_date[gte]"] = range.from;
+    if (range?.to)   params["expense_date[lte]"] = range.to;
+
+    return params;
+  })();
+
   const {
     data: expenses,
     isLoading,
     isError,
-  } = useFetch("expenses", "/expenses", {
-    page: currentPage,
-    limit: LIMIT,
-  });
+  } = useFetch("expenses", "/expenses", filterParams);
 
   const records = expenses?.data ?? [];
   const totalCount = expenses?.results ?? 0;
   const totalPages = Math.ceil(totalCount / LIMIT);
 
-  // Clear the undo timer when the component unmounts so we don't leak intervals
+  const hasActiveFilters = selectedCategory || datePreset;
+
+  // Close category dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (
+        categoryDropdownRef.current &&
+        !categoryDropdownRef.current.contains(e.target)
+      ) {
+        setShowCategoryDropdown(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // Reset page to 1 whenever filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedCategory, datePreset, customFrom, customTo]);
+
+  // Clear undo timer on unmount
   useEffect(() => {
     return () => {
       if (undoState?.timerId) clearInterval(undoState.timerId);
@@ -53,20 +141,38 @@ export default function ExpensesPage() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
+  const clearFilters = () => {
+    setSelectedCategory("");
+    setDatePreset("");
+    setCustomFrom("");
+    setCustomTo("");
+  };
+
+  const handleCategorySelect = (id) => {
+    setSelectedCategory((prev) => (prev === id ? "" : id));
+    setShowCategoryDropdown(false);
+  };
+
+  const handleDatePreset = (value) => {
+    setDatePreset((prev) => (prev === value ? "" : value));
+    if (value !== "custom") {
+      setCustomFrom("");
+      setCustomTo("");
+    }
+  };
+
+  const selectedCategoryName =
+    categories.find((c) => String(c.id) === String(selectedCategory))?.name ??
+    "Category";
+
   const handleExportExcel = async () => {
     try {
-      // Use a raw axios instance to bypass any JSON interceptors on the api
-      // instance that would throw when receiving a blob instead of JSON
       const token = api.defaults.headers.common["Authorization"];
       const baseURL = api.defaults.baseURL;
-
       const response = await axios.get(`${baseURL}/expenses/export/excel`, {
         responseType: "blob",
-        headers: {
-          ...(token ? { Authorization: token } : {}),
-        },
+        headers: { ...(token ? { Authorization: token } : {}) },
       });
-
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement("a");
       link.href = url;
@@ -74,23 +180,17 @@ export default function ExpensesPage() {
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-
-      // Delay revoke slightly so the browser has time to start the download
       setTimeout(() => window.URL.revokeObjectURL(url), 150);
-    } catch (error) {
+    } catch {
       toast.error("Failed to export expenses");
     }
   };
 
-  const handleImportClick = () => {
-    fileInputRef.current?.click();
-  };
+  const handleImportClick = () => fileInputRef.current?.click();
 
   const handleFileChange = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
-
-    // Reset so the same file can be re-selected if needed
     e.target.value = "";
 
     if (!file.name.endsWith(".xlsx") && !file.name.endsWith(".xls")) {
@@ -100,22 +200,17 @@ export default function ExpensesPage() {
 
     const formData = new FormData();
     formData.append("file", file);
-
     setIsImporting(true);
+
     try {
       const response = await api.post("/expenses/import/excel", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
-
       const importedIds = response.data.ids ?? [];
-
       queryClient.invalidateQueries({ queryKey: ["expenses"] });
       toast.success(response.data.message ?? "Expenses imported successfully");
 
-      // Clear any existing undo timer before starting a new one
       if (undoState?.timerId) clearInterval(undoState.timerId);
-
-      // Start a countdown — every second decrement secondsLeft until it hits 0
       let secondsLeft = UNDO_TIMEOUT;
       const timerId = setInterval(() => {
         secondsLeft -= 1;
@@ -125,12 +220,9 @@ export default function ExpensesPage() {
           setUndoState(null);
         }
       }, 1000);
-
       setUndoState({ ids: importedIds, secondsLeft, timerId });
     } catch (error) {
-      const message =
-        error.response?.data?.message ?? "Failed to import expenses";
-      toast.error(message);
+      toast.error(error.response?.data?.message ?? "Failed to import expenses");
     } finally {
       setIsImporting(false);
     }
@@ -138,17 +230,14 @@ export default function ExpensesPage() {
 
   const handleUndo = async () => {
     if (!undoState) return;
-
-    // Stop the countdown immediately
     clearInterval(undoState.timerId);
     const idsToDelete = undoState.ids;
     setUndoState(null);
-
     try {
       await api.delete("/expenses/bulk", { data: { ids: idsToDelete } });
       queryClient.invalidateQueries({ queryKey: ["expenses"] });
       toast.success("Import undone successfully");
-    } catch (error) {
+    } catch {
       toast.error("Failed to undo import");
     }
   };
@@ -156,8 +245,9 @@ export default function ExpensesPage() {
   return (
     <div className="bg-gray-light font-body min-h-screen px-4 py-8">
       <div className="mx-auto max-w-6xl">
-        {/* Header */}
-        <div className="mb-8 flex flex-wrap items-start justify-between gap-4">
+
+        {/* ── Header ──────────────────────────────────────────────────── */}
+        <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
           <div>
             <h1 className="font-heading text-3xl leading-tight font-bold text-black">
               Expenses
@@ -175,7 +265,6 @@ export default function ExpensesPage() {
               Add Expense
             </button>
 
-            {/* Hidden file input */}
             <input
               ref={fileInputRef}
               type="file"
@@ -184,7 +273,6 @@ export default function ExpensesPage() {
               onChange={handleFileChange}
             />
 
-            {/* Import button */}
             <button
               onClick={handleImportClick}
               disabled={isImporting}
@@ -215,7 +303,102 @@ export default function ExpensesPage() {
           </div>
         </div>
 
-        {/* Undo banner — shown for UNDO_TIMEOUT seconds after a successful import */}
+        {/* ── Filters ─────────────────────────────────────────────────── */}
+        <div className="mb-5 flex flex-wrap items-center gap-2.5">
+
+          {/* Date presets */}
+          {DATE_PRESETS.map((preset) => (
+            <button
+              key={preset.value}
+              onClick={() => handleDatePreset(preset.value)}
+              className={`cursor-pointer rounded-xl border px-4 py-2 text-sm font-medium transition-all duration-150 ${
+                datePreset === preset.value
+                  ? "border-green bg-green text-white shadow-sm"
+                  : "border-gray-200 bg-white text-gray-600 hover:border-green hover:text-green"
+              }`}
+            >
+              {preset.label}
+            </button>
+          ))}
+
+          {/* Custom date inputs — only shown when "Custom" is active */}
+          {datePreset === "custom" && (
+            <div className="flex items-center gap-2">
+              <input
+                type="date"
+                value={customFrom}
+                onChange={(e) => setCustomFrom(e.target.value)}
+                className="border-green focus:ring-green rounded-xl border bg-white px-3 py-2 text-sm text-gray-700 shadow-sm outline-none focus:ring-2 focus:ring-offset-0"
+              />
+              <span className="text-xs text-gray-400">to</span>
+              <input
+                type="date"
+                value={customTo}
+                onChange={(e) => setCustomTo(e.target.value)}
+                min={customFrom}
+                className="border-green focus:ring-green rounded-xl border bg-white px-3 py-2 text-sm text-gray-700 shadow-sm outline-none focus:ring-2 focus:ring-offset-0"
+              />
+            </div>
+          )}
+
+          {/* Divider */}
+          <div className="h-6 w-px bg-gray-200" />
+
+          {/* Category dropdown */}
+          <div className="relative" ref={categoryDropdownRef}>
+            <button
+              onClick={() => setShowCategoryDropdown((v) => !v)}
+              className={`inline-flex cursor-pointer items-center gap-2 rounded-xl border px-4 py-2 text-sm font-medium transition-all duration-150 ${
+                selectedCategory
+                  ? "border-green bg-green text-white shadow-sm"
+                  : "border-gray-200 bg-white text-gray-600 hover:border-green hover:text-green"
+              }`}
+            >
+              {selectedCategoryName}
+              <ChevronDown
+                size={14}
+                className={`transition-transform duration-150 ${showCategoryDropdown ? "rotate-180" : ""}`}
+              />
+            </button>
+
+            {showCategoryDropdown && (
+              <div className="absolute top-full left-0 z-20 mt-1.5 max-h-56 min-w-44 overflow-y-auto rounded-xl border border-gray-100 bg-white py-1.5 shadow-lg">
+                {categories.length === 0 ? (
+                  <p className="px-4 py-2 text-xs text-gray-400">
+                    No categories found
+                  </p>
+                ) : (
+                  categories.map((cat) => (
+                    <button
+                      key={cat.id}
+                      onClick={() => handleCategorySelect(String(cat.id))}
+                      className={`w-full cursor-pointer px-4 py-2 text-left text-sm transition-colors ${
+                        String(selectedCategory) === String(cat.id)
+                          ? "bg-green-50 text-green font-semibold"
+                          : "text-gray-700 hover:bg-gray-50"
+                      }`}
+                    >
+                      {cat.name}
+                    </button>
+                  ))
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* Clear all filters */}
+          {hasActiveFilters && (
+            <button
+              onClick={clearFilters}
+              className="inline-flex cursor-pointer items-center gap-1.5 rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm text-gray-400 transition-colors hover:border-red-200 hover:text-red-400"
+            >
+              <X size={13} />
+              Clear
+            </button>
+          )}
+        </div>
+
+        {/* ── Undo banner ──────────────────────────────────────────────── */}
         {undoState && (
           <div className="mb-5 flex items-center justify-between rounded-xl border border-green-100 bg-green-50 px-5 py-3 shadow-sm">
             <p className="text-sm text-gray-600">
@@ -227,7 +410,7 @@ export default function ExpensesPage() {
             </p>
             <button
               onClick={handleUndo}
-              className="inline-flex items-center cursor-pointer gap-1.5 rounded-lg border border-red-200 bg-white px-3 py-1.5 text-xs font-semibold text-red-500 transition-colors hover:bg-red-50"
+              className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-red-200 bg-white px-3 py-1.5 text-xs font-semibold text-red-500 transition-colors hover:bg-red-50"
             >
               <Undo2 size={13} />
               Undo
@@ -235,7 +418,7 @@ export default function ExpensesPage() {
           </div>
         )}
 
-        {/* Loading */}
+        {/* ── Loading ──────────────────────────────────────────────────── */}
         {isLoading && (
           <div className="flex flex-col items-center justify-center gap-3 rounded-2xl bg-white py-16 shadow-sm">
             <div className="border-t-green h-8 w-8 animate-spin rounded-full border-[3px] border-gray-200" />
@@ -243,7 +426,7 @@ export default function ExpensesPage() {
           </div>
         )}
 
-        {/* Error */}
+        {/* ── Error ────────────────────────────────────────────────────── */}
         {isError && (
           <div className="flex items-center justify-center rounded-2xl border border-red-100 bg-red-50 py-16">
             <p className="text-red text-sm font-medium">
@@ -252,23 +435,36 @@ export default function ExpensesPage() {
           </div>
         )}
 
-        {/* Empty */}
+        {/* ── Empty ────────────────────────────────────────────────────── */}
         {!isLoading && !isError && records.length === 0 && (
           <div className="flex flex-col items-center justify-center gap-3 rounded-2xl bg-white py-16 shadow-sm">
             <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-green-50">
               <Download size={22} className="text-green" />
             </div>
-            <p className="text-sm text-gray-400">No expenses found.</p>
-            <button
-              onClick={() => setShowAddModal(true)}
-              className="text-green mt-1 inline-flex items-center gap-1.5 text-sm font-semibold hover:underline"
-            >
-              <Plus size={14} /> Add your first expense
-            </button>
+            <p className="text-sm text-gray-400">
+              {hasActiveFilters
+                ? "No expenses match the selected filters."
+                : "No expenses found."}
+            </p>
+            {hasActiveFilters ? (
+              <button
+                onClick={clearFilters}
+                className="text-green mt-1 inline-flex items-center gap-1.5 text-sm font-semibold hover:underline"
+              >
+                <X size={14} /> Clear filters
+              </button>
+            ) : (
+              <button
+                onClick={() => setShowAddModal(true)}
+                className="text-green mt-1 inline-flex items-center gap-1.5 text-sm font-semibold hover:underline"
+              >
+                <Plus size={14} /> Add your first expense
+              </button>
+            )}
           </div>
         )}
 
-        {/* Table */}
+        {/* ── Table ────────────────────────────────────────────────────── */}
         {!isLoading && !isError && records.length > 0 && (
           <div className="overflow-x-auto rounded-2xl bg-white shadow-sm">
             <table className="w-full min-w-200 border-collapse text-sm">
@@ -300,35 +496,24 @@ export default function ExpensesPage() {
                       index % 2 === 0 ? "bg-white" : "bg-white-soft"
                     }`}
                   >
-                    {/* Date */}
                     <td className="px-5 py-3.5 align-middle">
                       <span className="inline-block rounded-md bg-gray-100 px-2 py-1 text-xs font-medium whitespace-nowrap text-gray-600">
                         {expense.expense_date
                           ? new Date(expense.expense_date).toLocaleDateString(
                               "en-GB",
-                              {
-                                day: "2-digit",
-                                month: "short",
-                                year: "numeric",
-                              },
+                              { day: "2-digit", month: "short", year: "numeric" },
                             )
                           : "—"}
                       </span>
                     </td>
-
-                    {/* Description */}
                     <td className="text-dark max-w-55 truncate px-5 py-3.5 align-middle">
                       {expense.description || "—"}
                     </td>
-
-                    {/* Category */}
                     <td className="px-5 py-3.5 align-middle">
                       <span className="text-green inline-block rounded-full bg-green-100 px-3 py-1 text-xs font-semibold">
                         {expense.category_name || "—"}
                       </span>
                     </td>
-
-                    {/* Amount */}
                     <td className="px-5 py-3.5 align-middle font-bold text-black tabular-nums">
                       {expense.amount != null
                         ? Number(expense.amount).toLocaleString("en-US", {
@@ -336,13 +521,9 @@ export default function ExpensesPage() {
                           })
                         : "—"}
                     </td>
-
-                    {/* Unit */}
                     <td className="px-5 py-3.5 align-middle text-gray-500">
                       {expense.unit || "—"}
                     </td>
-
-                    {/* Paid By */}
                     <td className="px-5 py-3.5 align-middle">
                       <div className="flex items-center gap-2">
                         <div className="bg-green flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[11px] font-bold text-white">
@@ -355,8 +536,6 @@ export default function ExpensesPage() {
                         </span>
                       </div>
                     </td>
-
-                    {/* Actions */}
                     {user?.data?.id === expense.paid_by && (
                       <td className="px-5 py-3.5 align-middle">
                         <div className="flex items-center gap-2">
@@ -384,7 +563,7 @@ export default function ExpensesPage() {
           </div>
         )}
 
-        {/* Pagination */}
+        {/* ── Pagination ───────────────────────────────────────────────── */}
         {!isLoading && !isError && records.length > 0 && (
           <Pagination
             currentPage={currentPage}
@@ -396,7 +575,7 @@ export default function ExpensesPage() {
         )}
       </div>
 
-      {/* Modals */}
+      {/* ── Modals ───────────────────────────────────────────────────────── */}
       {showAddModal && <ExpenseModal onClose={() => setShowAddModal(false)} />}
       {editExpense && (
         <ExpenseModal
