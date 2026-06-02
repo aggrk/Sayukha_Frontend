@@ -9,7 +9,7 @@ export function About() {
       id="about"
       className="grid grid-cols-1 items-center gap-20 bg-black px-[8vw] py-24 lg:grid-cols-2"
     >
-      {/* Visual */}
+      {/* Visual section */}
       <FadeUp className="relative hidden lg:block">
         <div className="clip-building relative aspect-4/5 w-full overflow-hidden bg-linear-to-br from-[#1a2a1a] to-[#0d1a0d]">
           <Image
